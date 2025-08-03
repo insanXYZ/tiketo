@@ -33,7 +33,7 @@ func (u *UserController) handleLogin(c echo.Context) error {
 		return httpresponse.Error(c, "bind err", err)
 	}
 
-	accToken, refToken, err := u.userService.Login(c.Request().Context(), req)
+	accToken, refToken, err := u.userService.HandleLogin(c.Request().Context(), req)
 
 	cookie := &http.Cookie{
 		Value:    "Bearer " + refToken,
@@ -53,5 +53,17 @@ func (u *UserController) handleLogin(c echo.Context) error {
 }
 
 func (u *UserController) handleRegister(c echo.Context) error {
-	return nil
+	var req *dto.Register
+
+	err := c.Bind(req)
+	if err != nil {
+		return err
+	}
+
+	err = u.userService.HandleRegister(c.Request().Context(), req)
+	if err != nil {
+		return httpresponse.Error(c, "failed register", err)
+	}
+
+	return httpresponse.Success(c, "success register", nil)
 }
