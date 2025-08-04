@@ -11,9 +11,5 @@ type UserRepository struct {
 }
 
 func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{
-		Repository: Repository[*entity.User]{
-			db: db,
-		},
-	}
+	return &UserRepository{}
 }

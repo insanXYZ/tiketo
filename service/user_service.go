@@ -18,12 +18,15 @@ import (
 
 type UserService struct {
 	userRepository *repository.UserRepository
+	db             *gorm.DB
 	redis          *redis.Client
 }
 
-func NewUserService(userRepository *repository.UserRepository) *UserService {
+func NewUserService(userRepository *repository.UserRepository, db *gorm.DB, redis *redis.Client) *UserService {
 	return &UserService{
 		userRepository: userRepository,
+		db:             db,
+		redis:          redis,
 	}
 }
 
@@ -43,7 +46,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 		Email: req.Email,
 	}
 
-	err = u.userRepository.Take(ctx, user)
+	err = u.userRepository.Take(ctx, u.db, user)
 	if err != nil {
 		return
 	}
@@ -83,7 +86,7 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 		Email: req.Email,
 	}
 
-	err = u.userRepository.Take(ctx, user)
+	err = u.userRepository.Take(ctx, u.db, user)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err // error email was used
 	}
@@ -97,7 +100,7 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 	user.Name = req.Name
 	user.Password = string(b)
 
-	return u.userRepository.Create(ctx, user)
+	return u.userRepository.Create(ctx, u.db, user)
 
 }
 

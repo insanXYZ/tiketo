@@ -7,13 +7,12 @@ import (
 )
 
 type Repository[T any] struct {
-	db *gorm.DB
 }
 
-func (r *Repository[T]) Create(ctx context.Context, model T) error {
-	return r.db.WithContext(ctx).Create(model).Error
+func (r *Repository[T]) Create(ctx context.Context, db *gorm.DB, model T) error {
+	return db.WithContext(ctx).Create(model).Error
 }
 
-func (r *Repository[T]) Take(ctx context.Context, model T) error {
-	return r.db.WithContext(ctx).Take(model).Error
+func (r *Repository[T]) Take(ctx context.Context, db *gorm.DB, model T) error {
+	return db.WithContext(ctx).Take(model).Error
 }
