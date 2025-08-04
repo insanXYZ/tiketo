@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -25,6 +26,11 @@ func NewUserService(userRepository *repository.UserRepository) *UserService {
 		userRepository: userRepository,
 	}
 }
+
+const (
+	Exp_Acc_Token = 15 * time.Minute
+	Exp_Ref_Token = 24 * time.Hour
+)
 
 func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken, refToken string, err error) {
 
@@ -48,7 +54,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 	}
 
 	claims := jwt.MapClaims{
-		"exp":  time.Now().Add(15 * time.Minute).Unix(),
+		"exp":  time.Now().Add(Exp_Acc_Token).Unix(),
 		"sub":  user.ID,
 		"name": user.Name,
 	}
@@ -59,7 +65,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 		return
 	}
 
-	claims["exp"] = time.Now().Add(24 * time.Hour).Unix()
+	claims["exp"] = time.Now().Add(Exp_Ref_Token).Unix()
 
 	refToken, err = util.GenerateJWT(claims)
 
@@ -87,9 +93,20 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 		return err
 	}
 
+	user.ID = uuid.NewString()
 	user.Name = req.Name
 	user.Password = string(b)
 
 	return u.userRepository.Create(ctx, user)
 
+}
+
+func (u *UserService) HandleRefresh(ctx context.Context, claims jwt.MapClaims) (string, error) {
+	return util.GenerateJWT(
+		util.BuildClaims(
+			claims["name"].(string),
+			claims["sub"].(string),
+			time.Now().Add(Exp_Acc_Token).Unix(),
+		),
+	)
 }

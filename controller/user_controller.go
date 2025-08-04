@@ -7,6 +7,7 @@ import (
 	"tiketo/util/httpresponse"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,11 +22,12 @@ func NewUserController(userService *service.UserService) *UserController {
 }
 
 func (u *UserController) RegisterRoutes(e *echo.Echo) {
-	e.POST("/login", u.handleLogin)
-	e.POST("/register", u.handleRegister)
+	e.POST("/login", u.Login)
+	e.POST("/register", u.Register)
+	e.GET("/refresh", u.Refresh)
 }
 
-func (u *UserController) handleLogin(c echo.Context) error {
+func (u *UserController) Login(c echo.Context) error {
 	var req *dto.Login
 
 	err := c.Bind(req)
@@ -52,7 +54,7 @@ func (u *UserController) handleLogin(c echo.Context) error {
 
 }
 
-func (u *UserController) handleRegister(c echo.Context) error {
+func (u *UserController) Register(c echo.Context) error {
 	var req *dto.Register
 
 	err := c.Bind(req)
@@ -66,4 +68,17 @@ func (u *UserController) handleRegister(c echo.Context) error {
 	}
 
 	return httpresponse.Success(c, "success register", nil)
+}
+
+func (u *UserController) Refresh(c echo.Context) error {
+	claims := c.Get("user").(jwt.MapClaims)
+
+	accToken, err := u.userService.HandleRefresh(c.Request().Context(), claims)
+	if err != nil {
+		return httpresponse.Error(c, "failed refresh", err)
+	}
+
+	return httpresponse.Success(c, "success refresh", echo.Map{
+		"access_token": accToken,
+	})
 }
