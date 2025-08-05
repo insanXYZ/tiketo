@@ -2,7 +2,10 @@ package main
 
 import (
 	"os"
+	"tiketo/controller"
 	"tiketo/db"
+	"tiketo/repository"
+	"tiketo/service"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -20,7 +23,7 @@ func main() {
 	}
 
 	// init db
-	pg, err := db.NewPostgresClient()
+	gorm, err := db.NewGorm()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -30,7 +33,19 @@ func main() {
 		panic(err.Error())
 	}
 
+	userRepository := repository.NewUserRepository()
+	ticketRepository := repository.NewTicketRepository()
+
+	userService := service.NewUserService(userRepository, gorm, redisClient)
+	ticketService := service.NewTicketService(ticketRepository, gorm, redisClient)
+
+	userController := controller.NewUserController(userService)
+	ticketController := controller.NewTicketController(ticketService)
+
 	e := echo.New()
+
+	userController.RegisterRoutes(e)
+	ticketController.RegisterRoutes(e)
 
 	e.Logger.Fatal(e.Start(os.Getenv("APP_PORT")))
 

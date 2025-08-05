@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"tiketo/dto"
+	"tiketo/dto/converter"
 	"tiketo/service"
 	"tiketo/util/httpresponse"
 	"time"
@@ -81,4 +82,15 @@ func (u *UserController) Refresh(c echo.Context) error {
 	return httpresponse.Success(c, "success refresh", echo.Map{
 		"access_token": accToken,
 	})
+}
+
+func (u *UserController) GetCurrentUser(c echo.Context) error {
+	claims := c.Get("user").(jwt.MapClaims)
+
+	user, err := u.userService.HandleGetCurrentUser(c.Request().Context(), claims)
+	if err != nil {
+		return httpresponse.Error(c, "failed get user", err)
+	}
+
+	return httpresponse.Success(c, "success get user", converter.UserEntityToDto(user))
 }

@@ -19,7 +19,34 @@ func NewTicketController(ticketService *service.TicketService) *TicketController
 	}
 }
 
-func (t *TicketController) CreateTicket(c echo.Context) error {
+func (t *TicketController) RegisterRoutes(c *echo.Echo) {
+
+}
+
+func (t *TicketController) Get(c echo.Context) error {
+	req := new(dto.GetTicket)
+	err := c.Bind(req)
+	if err != nil {
+		return httpresponse.Error(c, "error bind", err)
+	}
+
+	ticket, err := t.ticketService.HandleGet(c.Request().Context(), req)
+	if err != nil {
+		return httpresponse.Error(c, "failed get ticket", err)
+	}
+	return httpresponse.Success(c, "success get ticket", ticket)
+}
+
+func (t *TicketController) GetAll(c echo.Context) error {
+	tickets, err := t.ticketService.HandleGetAll(c.Request().Context())
+	if err != nil {
+		return httpresponse.Error(c, "failed get all tickets", err)
+	}
+
+	return httpresponse.Success(c, "success get all tickets", tickets)
+}
+
+func (t *TicketController) Create(c echo.Context) error {
 	claims := c.Get("user").(jwt.MapClaims)
 	req := new(dto.CreateTicket)
 
@@ -41,4 +68,38 @@ func (t *TicketController) CreateTicket(c echo.Context) error {
 	}
 
 	return httpresponse.Success(c, "success create ticket", nil)
+}
+
+func (t *TicketController) Delete(c echo.Context) error {
+	claims := c.Get("user").(jwt.MapClaims)
+	req := new(dto.DeleteTicket)
+
+	err := c.Bind(req)
+	if err != nil {
+		return httpresponse.Error(c, "error binding", err)
+	}
+
+	err = t.ticketService.HandleDelete(c.Request().Context(), claims, req)
+	if err != nil {
+		return httpresponse.Error(c, "failed delete ticket", err)
+	}
+
+	return httpresponse.Success(c, "success delete ticket", nil)
+}
+
+func (t *TicketController) Update(c echo.Context) error {
+	claims := c.Get("user").(jwt.MapClaims)
+	req := new(dto.UpdateTicket)
+
+	err := c.Bind(req)
+	if err != nil {
+		return httpresponse.Error(c, "error bind", err)
+	}
+
+	err = t.ticketService.HandleUpdate(c.Request().Context(), claims, req)
+	if err != nil {
+		return httpresponse.Error(c, "failed update ticket", err)
+	}
+
+	return httpresponse.Success(c, "success update ticket", nil)
 }

@@ -25,7 +25,7 @@ func Error(c echo.Context, message string, err error) error {
 		if ValidationErrors, ok := err.(validator.ValidationErrors); ok {
 			res.Errors = util.GetErrorValidateMessageStruct(ValidationErrors)
 		} else {
-			res.Message = err.Error()
+			res.Errors = err.Error()
 		}
 	}
 

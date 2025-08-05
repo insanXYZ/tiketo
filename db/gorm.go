@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewPostgresClient() (*gorm.DB, error) {
+func NewGorm() (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		os.Getenv("PG_HOST"),
 		os.Getenv("PG_USER"),

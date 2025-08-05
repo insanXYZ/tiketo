@@ -16,3 +16,11 @@ func (r *Repository[T]) Create(ctx context.Context, db *gorm.DB, model T) error 
 func (r *Repository[T]) Take(ctx context.Context, db *gorm.DB, model T) error {
 	return db.WithContext(ctx).Take(model).Error
 }
+
+func (r *Repository[T]) Delete(ctx context.Context, db *gorm.DB, model T) error {
+	return db.WithContext(ctx).Delete(model).Error
+}
+
+func (r *Repository[T]) Save(ctx context.Context, db *gorm.DB, model T) error {
+	return db.WithContext(ctx).Save(model).Error
+}

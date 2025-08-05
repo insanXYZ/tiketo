@@ -114,3 +114,13 @@ func (u *UserService) HandleRefresh(ctx context.Context, claims jwt.MapClaims) (
 
 	return util.GenerateAccToken(c)
 }
+
+func (u *UserService) HandleGetCurrentUser(ctx context.Context, claims jwt.MapClaims) (*entity.User, error) {
+
+	user := &entity.User{
+		ID: claims["sub"].(string),
+	}
+
+	err := u.userRepository.Take(ctx, u.db, user)
+	return user, err
+}
