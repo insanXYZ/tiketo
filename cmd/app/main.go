@@ -14,6 +14,11 @@ func main() {
 		panic(err.Error())
 	}
 
+	err = os.MkdirAll("assets/image/ticket", os.ModePerm)
+	if err != nil {
+		panic(err.Error())
+	}
+
 	// init db
 	pg, err := db.NewPostgresClient()
 	if err != nil {

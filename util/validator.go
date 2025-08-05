@@ -31,3 +31,7 @@ func GetErrorValidateMessageStruct(validationErrors validator.ValidationErrors) 
 
 	return errorsMap
 }
+
+func ValidateStruct(v any) error {
+	return Validator.Struct(v)
+}

@@ -62,7 +62,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 		"name": user.Name,
 	}
 
-	accToken, err = util.GenerateJWT(claims)
+	accToken, err = util.GenerateAccToken(claims)
 
 	if err != nil {
 		return
@@ -70,7 +70,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 
 	claims["exp"] = time.Now().Add(Exp_Ref_Token).Unix()
 
-	refToken, err = util.GenerateJWT(claims)
+	refToken, err = util.GenerateRefToken(claims)
 
 	return
 
@@ -105,11 +105,12 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 }
 
 func (u *UserService) HandleRefresh(ctx context.Context, claims jwt.MapClaims) (string, error) {
-	return util.GenerateJWT(
-		util.BuildClaims(
-			claims["name"].(string),
-			claims["sub"].(string),
-			time.Now().Add(Exp_Acc_Token).Unix(),
-		),
+
+	c := util.BuildClaims(
+		claims["name"].(string),
+		claims["sub"].(string),
+		time.Now().Add(Exp_Acc_Token).Unix(),
 	)
+
+	return util.GenerateAccToken(c)
 }

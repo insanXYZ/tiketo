@@ -28,7 +28,7 @@ func (u *UserController) RegisterRoutes(e *echo.Echo) {
 }
 
 func (u *UserController) Login(c echo.Context) error {
-	var req *dto.Login
+	req := new(dto.Login)
 
 	err := c.Bind(req)
 	if err != nil {
@@ -55,7 +55,7 @@ func (u *UserController) Login(c echo.Context) error {
 }
 
 func (u *UserController) Register(c echo.Context) error {
-	var req *dto.Register
+	req := new(dto.Register)
 
 	err := c.Bind(req)
 	if err != nil {

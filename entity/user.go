@@ -14,4 +14,5 @@ type User struct {
 	CreatedAt time.Time      `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"columd:updated_at;autoCreateTime;autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`
+	Tickets   []Ticket       `gorm:"foreignKey:user_id;references:id"`
 }

@@ -6,9 +6,17 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func GenerateJWT(claims jwt.MapClaims) (string, error) {
+func GenerateJWT(claims jwt.MapClaims, key string) (string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return t.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	return t.SignedString([]byte(key))
+}
+
+func GenerateAccToken(claims jwt.MapClaims) (string, error) {
+	return GenerateJWT(claims, os.Getenv("ACC_JWT_SECRET"))
+}
+
+func GenerateRefToken(claims jwt.MapClaims) (string, error) {
+	return GenerateJWT(claims, os.Getenv("REF_JWT_SECRET"))
 }
 
 func BuildClaims(name, sub string, exp int64) jwt.MapClaims {
