@@ -1,12 +1,29 @@
 package util
 
 import (
+	"mime/multipart"
 	"strings"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/insanXYZ/sage"
 )
 
-var Validator = validator.New()
+var Validator *validator.Validate
+
+func init() {
+	Validator = validator.New()
+
+	Validator.RegisterValidation("isImage", func(fl validator.FieldLevel) bool {
+		field := fl.Field().Interface().(*multipart.FileHeader)
+
+		err := sage.Validate(field)
+		if err != nil {
+			return false
+		}
+
+		return true
+	})
+}
 
 func GetErrorValidateMessageStruct(validationErrors validator.ValidationErrors) map[string]string {
 	errorsMap := make(map[string]string)

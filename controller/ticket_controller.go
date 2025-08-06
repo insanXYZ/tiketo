@@ -2,6 +2,7 @@ package controller
 
 import (
 	"tiketo/dto"
+	"tiketo/middleware"
 	"tiketo/service"
 	"tiketo/util/httpresponse"
 
@@ -20,7 +21,25 @@ func NewTicketController(ticketService *service.TicketService) *TicketController
 }
 
 func (t *TicketController) RegisterRoutes(c *echo.Echo) {
+	c.GET("/tickets/:id", t.Get)
+	c.GET("/tickets", t.GetAll)
 
+	hasAcc := c.Group("/me", middleware.HasAccToken)
+	hasAcc.GET("/tickets", t.GetUserTickets)
+	hasAcc.POST("/tickets", t.Create)
+	hasAcc.DELETE("/tickets/:id", t.Delete)
+	hasAcc.PUT("/tickets/:id", t.Update)
+}
+
+func (t *TicketController) GetUserTickets(c echo.Context) error {
+	claims := c.Get("user").(jwt.MapClaims)
+
+	tickets, err := t.ticketService.HandleGetUserTickets(c.Request().Context(), claims)
+	if err != nil {
+		return httpresponse.Error(c, "failed get user tickets", err)
+	}
+
+	return httpresponse.Success(c, "success get user tickets", tickets)
 }
 
 func (t *TicketController) Get(c echo.Context) error {

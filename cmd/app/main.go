@@ -4,6 +4,7 @@ import (
 	"os"
 	"tiketo/controller"
 	"tiketo/db"
+	"tiketo/middleware"
 	"tiketo/repository"
 	"tiketo/service"
 
@@ -16,6 +17,8 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
+	middleware.SetMiddleware()
 
 	err = os.MkdirAll("assets/image/ticket", os.ModePerm)
 	if err != nil {
@@ -43,7 +46,7 @@ func main() {
 	ticketController := controller.NewTicketController(ticketService)
 
 	e := echo.New()
-
+	e.Group("/api")
 	userController.RegisterRoutes(e)
 	ticketController.RegisterRoutes(e)
 

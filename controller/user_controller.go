@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"tiketo/dto"
 	"tiketo/dto/converter"
+	"tiketo/middleware"
 	"tiketo/service"
 	"tiketo/util/httpresponse"
 	"time"
@@ -25,7 +26,8 @@ func NewUserController(userService *service.UserService) *UserController {
 func (u *UserController) RegisterRoutes(e *echo.Echo) {
 	e.POST("/login", u.Login)
 	e.POST("/register", u.Register)
-	e.GET("/refresh", u.Refresh)
+	e.GET("/refresh", u.Refresh, middleware.HasRefToken)
+	e.GET("/me", u.GetCurrentUser, middleware.HasAccToken)
 }
 
 func (u *UserController) Login(c echo.Context) error {
@@ -39,7 +41,7 @@ func (u *UserController) Login(c echo.Context) error {
 	accToken, refToken, err := u.userService.HandleLogin(c.Request().Context(), req)
 
 	cookie := &http.Cookie{
-		Value:    "Bearer " + refToken,
+		Value:    refToken,
 		Path:     "/api/refresh",
 		Secure:   true,
 		Name:     "Refresh-Token",
@@ -50,7 +52,7 @@ func (u *UserController) Login(c echo.Context) error {
 	c.SetCookie(cookie)
 
 	return httpresponse.Success(c, "success login", echo.Map{
-		"access_token": "Bearer " + accToken,
+		"access_token": accToken,
 	})
 
 }

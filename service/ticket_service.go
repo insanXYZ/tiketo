@@ -28,6 +28,18 @@ func NewTicketService(repository *repository.TicketRepository, db *gorm.DB, redi
 	}
 }
 
+func (t *TicketService) HandleGetUserTickets(ctx context.Context, claims jwt.MapClaims) ([]entity.Ticket, error) {
+	tickets := make([]entity.Ticket, 0, 10)
+
+	user := &entity.User{
+		ID: claims["sub"].(string),
+	}
+
+	err := t.ticketRepository.FindUserTickets(ctx, t.db, user, tickets)
+
+	return tickets, err
+}
+
 func (t *TicketService) HandleCreateTicket(ctx context.Context, claims jwt.MapClaims, req *dto.CreateTicket) error {
 	err := util.ValidateStruct(req)
 	if err != nil {
