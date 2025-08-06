@@ -31,8 +31,8 @@ func NewUserService(userRepository *repository.UserRepository, db *gorm.DB, redi
 }
 
 const (
-	Exp_Acc_Token = 15 * time.Minute
-	Exp_Ref_Token = 24 * time.Hour
+	ExpAccToken = 15 * time.Minute
+	ExpRefToken = 24 * time.Hour
 )
 
 func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken, refToken string, err error) {
@@ -57,7 +57,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 	}
 
 	claims := jwt.MapClaims{
-		"exp":  time.Now().Add(Exp_Acc_Token).Unix(),
+		"exp":  time.Now().Add(ExpAccToken).Unix(),
 		"sub":  user.ID,
 		"name": user.Name,
 	}
@@ -68,7 +68,7 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 		return
 	}
 
-	claims["exp"] = time.Now().Add(Exp_Ref_Token).Unix()
+	claims["exp"] = time.Now().Add(ExpRefToken).Unix()
 
 	refToken, err = util.GenerateRefToken(claims)
 
@@ -109,7 +109,7 @@ func (u *UserService) HandleRefresh(ctx context.Context, claims jwt.MapClaims) (
 	c := util.BuildClaims(
 		claims["name"].(string),
 		claims["sub"].(string),
-		time.Now().Add(Exp_Acc_Token).Unix(),
+		time.Now().Add(ExpAccToken).Unix(),
 	)
 
 	return util.GenerateAccToken(c)

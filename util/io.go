@@ -7,11 +7,11 @@ import (
 )
 
 const (
-	path_ticket_image_dir = "assets/image/ticket/"
+	PathTicketImageDir = "assets/image/ticket/"
 )
 
 func SaveTicketImage(file multipart.File, filename string) error {
-	dst, err := os.Create(path_ticket_image_dir + filename)
+	dst, err := os.Create(PathTicketImageDir + filename)
 	if err != nil {
 		return err
 	}

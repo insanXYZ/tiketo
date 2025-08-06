@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"tiketo/dto"
 	"tiketo/dto/converter"
+	"tiketo/dto/message"
 	"tiketo/middleware"
 	"tiketo/service"
 	"tiketo/util/httpresponse"
@@ -35,7 +36,7 @@ func (u *UserController) Login(c echo.Context) error {
 
 	err := c.Bind(req)
 	if err != nil {
-		return httpresponse.Error(c, "bind err", err)
+		return httpresponse.Error(c, message.ErrBind, err)
 	}
 
 	accToken, refToken, err := u.userService.HandleLogin(c.Request().Context(), req)
@@ -44,7 +45,7 @@ func (u *UserController) Login(c echo.Context) error {
 		Value:    refToken,
 		Path:     "/api/refresh",
 		Secure:   true,
-		Name:     "Refresh-Token",
+		Name:     "refresh-token",
 		HttpOnly: true,
 		Expires:  time.Now().Add(24 * time.Hour),
 	}
@@ -52,7 +53,7 @@ func (u *UserController) Login(c echo.Context) error {
 	c.SetCookie(cookie)
 
 	return httpresponse.Success(c, "success login", echo.Map{
-		"access_token": accToken,
+		"access-token": accToken,
 	})
 
 }
@@ -62,15 +63,15 @@ func (u *UserController) Register(c echo.Context) error {
 
 	err := c.Bind(req)
 	if err != nil {
-		return err
+		return httpresponse.Error(c, message.ErrBind, err)
 	}
 
 	err = u.userService.HandleRegister(c.Request().Context(), req)
 	if err != nil {
-		return httpresponse.Error(c, "failed register", err)
+		return httpresponse.Error(c, message.ErrRegister, err)
 	}
 
-	return httpresponse.Success(c, "success register", nil)
+	return httpresponse.Success(c, message.SuccessRegister, nil)
 }
 
 func (u *UserController) Refresh(c echo.Context) error {
@@ -78,11 +79,11 @@ func (u *UserController) Refresh(c echo.Context) error {
 
 	accToken, err := u.userService.HandleRefresh(c.Request().Context(), claims)
 	if err != nil {
-		return httpresponse.Error(c, "failed refresh", err)
+		return httpresponse.Error(c, message.ErrRefresh, err)
 	}
 
-	return httpresponse.Success(c, "success refresh", echo.Map{
-		"access_token": accToken,
+	return httpresponse.Success(c, message.SuccessRefresh, echo.Map{
+		"access-token": accToken,
 	})
 }
 
@@ -91,8 +92,8 @@ func (u *UserController) GetCurrentUser(c echo.Context) error {
 
 	user, err := u.userService.HandleGetCurrentUser(c.Request().Context(), claims)
 	if err != nil {
-		return httpresponse.Error(c, "failed get user", err)
+		return httpresponse.Error(c, message.ErrGetCurrentUser, err)
 	}
 
-	return httpresponse.Success(c, "success get user", converter.UserEntityToDto(user))
+	return httpresponse.Success(c, message.SuccessGetCurrentUser, converter.UserEntityToDto(user))
 }

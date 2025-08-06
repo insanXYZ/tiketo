@@ -2,14 +2,13 @@ package repository
 
 import (
 	"context"
-	"tiketo/dst"
 	"tiketo/entity"
 
 	"gorm.io/gorm"
 )
 
 type TicketRepository struct {
-	Repository[*dst.Ticket]
+	Repository[*entity.Ticket]
 }
 
 func NewTicketRepository() *TicketRepository {
@@ -24,6 +23,6 @@ func (t *TicketRepository) FindWithUser(ctx context.Context, db *gorm.DB, dst []
 	return db.WithContext(ctx).Joins("User").Find(dst).Error
 }
 
-func (t *TicketRepository) FindUserTickets(ctx context.Context, db *gorm.DB, model *entity.User, dst []entity.Ticket) error {
-	return db.WithContext(ctx).Model(model).Find(dst).Error
+func (t *TicketRepository) FindUserTickets(ctx context.Context, db *gorm.DB, id string, dst []entity.Ticket) error {
+	return db.WithContext(ctx).Where("user_id = ?", id).Find(dst).Error
 }
