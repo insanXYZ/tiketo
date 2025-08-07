@@ -140,8 +140,8 @@ func (t *TicketService) HandleGet(ctx context.Context, req *dto.GetTicket) (*ent
 }
 
 func (t *TicketService) HandleGetAll(ctx context.Context) ([]entity.Ticket, error) {
-	tickets := make([]entity.Ticket, 0, 10)
+	var tickets []entity.Ticket
 
-	err := t.ticketRepository.FindWithUser(ctx, t.db, tickets)
+	err := t.ticketRepository.FindWithUser(ctx, t.db, &tickets)
 	return tickets, err
 }

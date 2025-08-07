@@ -2,18 +2,17 @@ package dto
 
 import (
 	"mime/multipart"
-	"time"
 )
 
 type Ticket struct {
-	ID          string    `gorm:"column:id"`
-	Name        string    `gorm:"column:name"`
-	Description string    `gorm:"column:description"`
-	Price       int       `gorm:"column:price"`
-	Image       string    `gorm:"column:image"`
-	Amount      int       `gorm:"column:amount"`
-	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
-	User        *User     `gorm:"foreignKey:user_id;references:id"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       int    `json:"price"`
+	Image       string `json:"image"`
+	Amount      int    `json:"amount"`
+	CreatedAt   string `json:"created_at"`
+	User        *User  `json:"created_by"`
 }
 
 type CreateTicket struct {

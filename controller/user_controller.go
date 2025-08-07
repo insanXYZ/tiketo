@@ -24,7 +24,7 @@ func NewUserController(userService *service.UserService) *UserController {
 	}
 }
 
-func (u *UserController) RegisterRoutes(e *echo.Echo) {
+func (u *UserController) RegisterRoutes(e *echo.Group) {
 	e.POST("/login", u.Login)
 	e.POST("/register", u.Register)
 	e.GET("/refresh", u.Refresh, middleware.HasRefToken)

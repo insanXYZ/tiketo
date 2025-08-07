@@ -46,10 +46,9 @@ func main() {
 	ticketController := controller.NewTicketController(ticketService)
 
 	e := echo.New()
-	e.Group("/api")
-	userController.RegisterRoutes(e)
-	ticketController.RegisterRoutes(e)
+	api := e.Group("/api")
+	userController.RegisterRoutes(api)
+	ticketController.RegisterRoutes(api)
 
 	e.Logger.Fatal(e.Start(os.Getenv("APP_PORT")))
-
 }

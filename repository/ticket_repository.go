@@ -19,7 +19,7 @@ func (t *TicketRepository) TakeWithUser(ctx context.Context, db *gorm.DB, dst *e
 	return db.WithContext(ctx).Joins("User").Take(dst).Error
 }
 
-func (t *TicketRepository) FindWithUser(ctx context.Context, db *gorm.DB, dst []entity.Ticket) error {
+func (t *TicketRepository) FindWithUser(ctx context.Context, db *gorm.DB, dst *[]entity.Ticket) error {
 	return db.WithContext(ctx).Joins("User").Find(dst).Error
 }
 

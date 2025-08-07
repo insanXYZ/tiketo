@@ -2,6 +2,7 @@ package controller
 
 import (
 	"tiketo/dto"
+	"tiketo/dto/converter"
 	"tiketo/dto/message"
 	"tiketo/middleware"
 	"tiketo/service"
@@ -21,7 +22,7 @@ func NewTicketController(ticketService *service.TicketService) *TicketController
 	}
 }
 
-func (t *TicketController) RegisterRoutes(c *echo.Echo) {
+func (t *TicketController) RegisterRoutes(c *echo.Group) {
 	c.GET("/tickets/:id", t.Get)
 	c.GET("/tickets", t.GetAll)
 
@@ -40,7 +41,7 @@ func (t *TicketController) GetUserTickets(c echo.Context) error {
 		return httpresponse.Error(c, message.ErrGetUserTickets, err)
 	}
 
-	return httpresponse.Success(c, message.SuccessGetUserTickets, tickets)
+	return httpresponse.Success(c, message.SuccessGetUserTickets, converter.TicketEntitiesToDto(tickets))
 }
 
 func (t *TicketController) Get(c echo.Context) error {
@@ -54,7 +55,7 @@ func (t *TicketController) Get(c echo.Context) error {
 	if err != nil {
 		return httpresponse.Error(c, message.ErrGetTicket, err)
 	}
-	return httpresponse.Success(c, message.SuccessGetTicket, ticket)
+	return httpresponse.Success(c, message.SuccessGetTicket, converter.TicketEntityToDto(ticket))
 }
 
 func (t *TicketController) GetAll(c echo.Context) error {
@@ -63,7 +64,7 @@ func (t *TicketController) GetAll(c echo.Context) error {
 		return httpresponse.Error(c, message.ErrGetTickets, err)
 	}
 
-	return httpresponse.Success(c, message.SuccessGetTickets, tickets)
+	return httpresponse.Success(c, message.SuccessGetTickets, converter.TicketEntitiesToDto(tickets))
 }
 
 func (t *TicketController) Create(c echo.Context) error {
