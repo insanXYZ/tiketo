@@ -18,7 +18,7 @@ func TicketEntityToDto(ticket *entity.Ticket) *dto.Ticket {
 		Description: ticket.Description,
 		Price:       ticket.Price,
 		Image:       util.PathTicketImageDir + ticket.Image,
-		Amount:      ticket.Amount,
+		Quantity:    ticket.Quantity,
 		CreatedAt:   ticket.CreatedAt.Format(time.DateTime),
 		User:        UserEntityToNameOnlyDto(ticket.User),
 	}

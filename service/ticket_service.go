@@ -64,7 +64,7 @@ func (t *TicketService) HandleCreateTicket(ctx context.Context, claims jwt.MapCl
 		Name:        req.Name,
 		Description: req.Description,
 		Price:       req.Price,
-		Amount:      req.Amount,
+		Quantity:    req.Quantity,
 		UserID:      claims["sub"].(string),
 		Image:       req.ImageFile.Filename,
 	}
@@ -120,7 +120,7 @@ func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, 
 	ticket.Name = req.Name
 	ticket.Description = req.Description
 	ticket.Price = req.Price
-	ticket.Amount = req.Amount
+	ticket.Quantity = req.Quantity
 
 	return t.ticketRepository.Save(ctx, t.db, ticket)
 }
