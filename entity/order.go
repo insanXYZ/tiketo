@@ -1,4 +1,24 @@
 package entity
 
+import (
+	"time"
+)
+
+type Status string
+
+const (
+	Unpaid Status = "unpaid"
+	Paid   Status = "paid"
+	Cancel Status = "cancel"
+)
+
 type Order struct {
+	ID         string       `gorm:"column:id;primaryKey"`
+	Status     Status       `gorm:"column:status"`
+	UserID     string       `gorm:"column:user_id"`
+	Total      int          `gorm:"column:total"`
+	CreatedAt  time.Time    `gorm:"column:created_at;autoCreateTime"`
+	PaidAt     time.Time    `gorm:"column:paid_at"`
+	OrderDetal *OrderDetail `gorm:"foreignKey:order_id;references:id"`
+	User       *User        `gorm:"foreignKey:user_id;references:id"`
 }

@@ -12,6 +12,7 @@ const (
 	ErrCreateTicket   = "Failed to create ticket"
 	ErrDeleteTicket   = "Failed to delete ticket"
 	ErrUpdateTicket   = "Failed to update ticket"
+	ErrCreateOrder    = "Failed to create order"
 )
 
 const (
@@ -24,4 +25,5 @@ const (
 	SuccessCreateTicket   = "Ticket created successfully"
 	SuccessDeleteTicket   = "Ticket deleted successfully"
 	SuccessUpdateTicket   = "Ticket updated successfully"
+	SuccessCreateOrder    = "Order created successfully"
 )
