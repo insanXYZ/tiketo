@@ -36,6 +36,16 @@ func NewOrderService(orderRepository *repository.OrderRepository, orderDetailRep
 	}
 }
 
+func (o *OrderService) HandleGetHistoryOrder(ctx context.Context, claims jwt.MapClaims, req *dto.GetOrder) (*entity.Order, error) {
+	order := &entity.Order{
+		ID:     req.TicketID,
+		UserID: claims["sub"].(string),
+	}
+
+	err := o.orderRepository.TakeWithDetailOrder(ctx, o.db, order)
+	return order, err
+}
+
 func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, req *dto.CreateOrder) (*snap.Response, error) {
 	var snapResponse *snap.Response
 
@@ -120,4 +130,12 @@ func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, r
 	})
 
 	return snapResponse, err
+}
+
+func (o *OrderService) HandleGetHistoryOrders(ctx context.Context, claims jwt.MapClaims) ([]entity.Order, error) {
+	var orders []entity.Order
+	idUser := claims["sub"].(string)
+
+	err := o.orderRepository.FindAllHistoryUser(ctx, o.db, &orders, idUser)
+	return orders, err
 }

@@ -29,7 +29,7 @@ func NewTicketService(repository *repository.TicketRepository, db *gorm.DB, redi
 }
 
 func (t *TicketService) HandleGetUserTickets(ctx context.Context, claims jwt.MapClaims) ([]entity.Ticket, error) {
-	tickets := make([]entity.Ticket, 0, 10)
+	var tickets []entity.Ticket
 
 	idUser := claims["sub"].(string)
 
