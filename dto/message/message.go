@@ -1,20 +1,23 @@
 package message
 
 const (
-	ErrBind             = "Invalid request payload"
-	ErrRegister         = "Failed to register user"
-	ErrRefresh          = "Failed to refresh access token"
-	ErrGetCurrentUser   = "Failed to retrieve user identity"
-	ErrGetUserTickets   = "Failed to retrieve user tickets"
-	ErrGetTicket        = "Failed to retrieve ticket"
-	ErrGetTickets       = "Failed to retrieve all tickets"
-	ErrGetFormFile      = "Failed to retrieve uploaded file"
-	ErrCreateTicket     = "Failed to create ticket"
-	ErrDeleteTicket     = "Failed to delete ticket"
-	ErrUpdateTicket     = "Failed to update ticket"
-	ErrCreateOrder      = "Failed to create order"
-	ErrGetHistoryOrders = "Failed to retrieve history orders"
-	ErrGetHistoryOrder  = "Failed to retrieve history order"
+	ErrBind              = "Invalid request payload"
+	ErrRegister          = "Failed to register user"
+	ErrRefresh           = "Failed to refresh access token"
+	ErrGetCurrentUser    = "Failed to retrieve user identity"
+	ErrGetUserTickets    = "Failed to retrieve user tickets"
+	ErrGetTicket         = "Failed to retrieve ticket"
+	ErrGetTickets        = "Failed to retrieve all tickets"
+	ErrGetFormFile       = "Failed to retrieve uploaded file"
+	ErrCreateTicket      = "Failed to create ticket"
+	ErrDeleteTicket      = "Failed to delete ticket"
+	ErrUpdateTicket      = "Failed to update ticket"
+	ErrCreateOrder       = "Failed to create order"
+	ErrGetHistoryOrders  = "Failed to retrieve history orders"
+	ErrGetHistoryOrder   = "Failed to retrieve history order"
+	ErrPaymentProcess    = "Failed process payment"
+	ErrTransactionStatus = "Invalid transaction status"
+	ErrSignatureKey      = "Invalid signature key"
 )
 
 const (
@@ -30,4 +33,5 @@ const (
 	SuccessCreateOrder      = "Order created successfully"
 	SuccessGetHistoryOrders = "History orders retrieved successfully"
 	SuccessGetHistoryOrder  = "History order retrieved successfully"
+	SuccessPaymentProcess   = "Success process payment"
 )

@@ -25,6 +25,22 @@ func (o *OrderController) RegisterRoutes(e *echo.Group) {
 	e.POST("/orders", o.CreateOrder, middleware.HasAccToken)
 	e.GET("/me/orders", o.GetHistoryOrders, middleware.HasAccToken)
 	e.GET("/me/orders/:id", o.GetHistoryOrder, middleware.HasAccToken)
+	e.POST("/orders/callback", o.AfterPayment)
+}
+
+func (o *OrderController) AfterPayment(c echo.Context) error {
+	req := new(dto.AfterPayment)
+	err := c.Bind(req)
+	if err != nil {
+		return httpresponse.Error(c, message.ErrBind, err)
+	}
+
+	err = o.orderService.HandleAfterPayment(c.Request().Context(), req)
+	if err != nil {
+		return httpresponse.Error(c, message.ErrPaymentProcess, err)
+	}
+
+	return httpresponse.Success(c, message.SuccessPaymentProcess, nil)
 }
 
 func (o *OrderController) GetHistoryOrder(c echo.Context) error {

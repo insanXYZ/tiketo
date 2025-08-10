@@ -2,8 +2,12 @@ package service
 
 import (
 	"context"
+	"crypto/sha512"
+	"errors"
 	"os"
+	"slices"
 	"tiketo/dto"
+	"tiketo/dto/message"
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
@@ -34,6 +38,44 @@ func NewOrderService(orderRepository *repository.OrderRepository, orderDetailRep
 		redis:                 redis,
 		db:                    db,
 	}
+}
+
+func (o *OrderService) HandleAfterPayment(ctx context.Context, req *dto.AfterPayment) error {
+	err := util.ValidateStruct(req)
+	if err != nil {
+		return err
+	}
+
+	validTransactionStatus := []string{"capture", "settlement"}
+
+	if slices.Contains(validTransactionStatus, req.TransactionStatus) {
+		s := sha512.New()
+		s.Write([]byte(req.OrderId + req.StatusCode + req.GrossAmount + os.Getenv("MIDTRANS_SERVER_KEY")))
+
+		calSignatureKey := s.Sum(nil)
+
+		if string(calSignatureKey) != req.SignatureKey {
+			return errors.New(message.ErrSignatureKey)
+		}
+
+		order := &entity.Order{
+			ID: req.OrderId,
+		}
+
+		err := o.orderRepository.Take(ctx, o.db, order)
+		if err != nil {
+			return err
+		}
+
+		order.Status = entity.Paid
+
+		err = o.orderRepository.Save(ctx, o.db, order)
+		if err != nil {
+			return err
+		}
+	}
+
+	return errors.New(message.ErrTransactionStatus)
 }
 
 func (o *OrderService) HandleGetHistoryOrder(ctx context.Context, claims jwt.MapClaims, req *dto.GetOrder) (*entity.Order, error) {
