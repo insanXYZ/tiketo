@@ -2,6 +2,8 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
@@ -10,7 +12,16 @@ import (
 )
 
 func Migrate() error {
-	db, err := sql.Open("postgres", "postgres://localhost:5432/database?sslmode=enable")
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		os.Getenv("PG_USER"),
+		os.Getenv("PG_PASSWORD"),
+		os.Getenv("PG_HOST"),
+		os.Getenv("PG_PORT"),
+		os.Getenv("PG_NAME"),
+		os.Getenv("PG_SSL_MODE"),
+	)
+
+	db, err := sql.Open("postgres", dsn)
 	if err != nil {
 		return err
 	}
@@ -20,13 +31,11 @@ func Migrate() error {
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
-		"file:///db/migrations",
+		"file://db/migrations",
 		"postgres", driver)
 	if err != nil {
 		return err
 	}
 
-	m.Up()
-
-	return nil
+	return m.Up()
 }

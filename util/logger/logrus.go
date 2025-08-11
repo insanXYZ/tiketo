@@ -7,10 +7,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var Log *logrus.Logger
+var log *logrus.Logger
 
 func InitLogger() {
-	Log = logrus.New()
+	log = logrus.New()
 	var level logrus.Level
 
 	envLevel := strings.ToLower(os.Getenv("LOG_LEVEL"))
@@ -33,5 +33,17 @@ func InitLogger() {
 		level = logrus.InfoLevel
 	}
 
-	Log.SetLevel(level)
+	log.SetLevel(level)
+}
+
+func Fatal(fields logrus.Fields, args ...any) {
+	log.WithFields(fields).Fatal(args...)
+}
+
+func Info(fields logrus.Fields, args ...any) {
+	log.WithFields(fields).Info(args...)
+}
+
+func Warn(fields logrus.Fields, args ...any) {
+	log.WithFields(fields).Warn(args...)
 }
