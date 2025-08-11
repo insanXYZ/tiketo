@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -18,7 +19,7 @@ type Order struct {
 	UserID      string       `gorm:"column:user_id"`
 	Total       int          `gorm:"column:total"`
 	CreatedAt   time.Time    `gorm:"column:created_at;autoCreateTime"`
-	PaidAt      time.Time    `gorm:"column:paid_at"`
+	PaidAt      sql.NullTime `gorm:"column:paid_at"`
 	OrderDetail *OrderDetail `gorm:"foreignKey:order_id;references:id"`
 	User        *User        `gorm:"foreignKey:user_id;references:id"`
 }

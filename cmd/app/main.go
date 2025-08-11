@@ -7,6 +7,7 @@ import (
 	"tiketo/middleware"
 	"tiketo/repository"
 	"tiketo/service"
+	"tiketo/util/logger"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -18,7 +19,13 @@ func main() {
 		panic(err.Error())
 	}
 
-	middleware.SetMiddleware()
+	middleware.InitMiddleware()
+	logger.InitLogger()
+
+	err = db.Migrate()
+	if err != nil {
+		panic(err.Error())
+	}
 
 	err = os.MkdirAll("assets/image/ticket", os.ModePerm)
 	if err != nil {

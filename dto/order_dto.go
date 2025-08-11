@@ -1,5 +1,19 @@
 package dto
 
+import (
+	"database/sql"
+	"time"
+)
+
+type Order struct {
+	ID          string       `json:"id,omitempty"`
+	Status      string       `json:"status,omitempty"`
+	Total       int          `json:"total,omitempty"`
+	CreatedAt   time.Time    `json:"created_at"`
+	PaidAt      sql.NullTime `json:"paid_at"`
+	OrderDetail *OrderDetail `json:"order_detail,omitempty"`
+}
+
 type CreateOrder struct {
 	TicketID string `json:"ticket_id" validate:"required"`
 	Quantity int    `json:"quantity" validate:"required,min=1"`

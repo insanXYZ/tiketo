@@ -2,6 +2,7 @@ package controller
 
 import (
 	"tiketo/dto"
+	"tiketo/dto/converter"
 	"tiketo/dto/message"
 	"tiketo/middleware"
 	"tiketo/service"
@@ -57,7 +58,7 @@ func (o *OrderController) GetHistoryOrder(c echo.Context) error {
 		return httpresponse.Error(c, message.ErrGetHistoryOrder, err)
 	}
 
-	return httpresponse.Success(c, message.SuccessGetHistoryOrder, order)
+	return httpresponse.Success(c, message.SuccessGetHistoryOrder, converter.OrderEntityToDto(order))
 }
 
 func (o *OrderController) GetHistoryOrders(c echo.Context) error {
@@ -68,7 +69,7 @@ func (o *OrderController) GetHistoryOrders(c echo.Context) error {
 		return httpresponse.Error(c, message.ErrGetHistoryOrders, err)
 	}
 
-	return httpresponse.Success(c, message.SuccessGetHistoryOrders, orders)
+	return httpresponse.Success(c, message.SuccessGetHistoryOrders, converter.OrderEntitiesToDto(orders))
 }
 
 func (o *OrderController) CreateOrder(c echo.Context) error {
@@ -80,10 +81,13 @@ func (o *OrderController) CreateOrder(c echo.Context) error {
 		return httpresponse.Error(c, message.ErrBind, err)
 	}
 
-	m, err := o.orderService.HandleCreate(c.Request().Context(), claims, req)
+	snapResponse, err := o.orderService.HandleCreate(c.Request().Context(), claims, req)
 	if err != nil {
 		return httpresponse.Error(c, message.ErrCreateOrder, err)
 	}
 
-	return httpresponse.Success(c, message.SuccessCreateTicket, m)
+	return httpresponse.Success(c, message.SuccessCreateTicket, jwt.MapClaims{
+		"token":        snapResponse.Token,
+		"redirect_url": snapResponse.RedirectURL,
+	})
 }

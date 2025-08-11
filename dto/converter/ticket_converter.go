@@ -12,7 +12,7 @@ func TicketEntityToDto(ticket *entity.Ticket) *dto.Ticket {
 		return nil
 	}
 
-	t := &dto.Ticket{
+	return &dto.Ticket{
 		ID:          ticket.ID,
 		Name:        ticket.Name,
 		Description: ticket.Description,
@@ -23,7 +23,6 @@ func TicketEntityToDto(ticket *entity.Ticket) *dto.Ticket {
 		User:        UserEntityToNameOnlyDto(ticket.User),
 	}
 
-	return t
 }
 
 func TicketEntitiesToDto(tickets []entity.Ticket) []dto.Ticket {

@@ -10,7 +10,7 @@ import (
 
 var HasAccToken, HasRefToken echo.MiddlewareFunc
 
-func SetMiddleware() {
+func InitMiddleware() {
 	HasAccToken = buildJwtMiddleware(os.Getenv("ACC_JWT_SECRET"), withTokenLookup("header:Authorization"))
 	HasRefToken = buildJwtMiddleware(os.Getenv("REF_JWT_SECRET"), withTokenLookup("header:cookie:refresh-token"))
 }

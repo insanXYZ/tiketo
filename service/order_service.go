@@ -108,6 +108,7 @@ func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, r
 		ticket := &entity.Ticket{
 			ID: req.TicketID,
 		}
+
 		err = o.ticketRepository.Take(ctx, tx, ticket)
 		if err != nil {
 			return err
