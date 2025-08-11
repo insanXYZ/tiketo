@@ -7,11 +7,13 @@ import (
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
+	"tiketo/util/logger"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -42,6 +44,10 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 		return
 	}
 
+	logger.Debug(logrus.Fields{
+		"req": req,
+	}, "req login on handle login")
+
 	user := &entity.User{
 		Email: req.Email,
 	}
@@ -50,6 +56,10 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 	if err != nil {
 		return
 	}
+
+	logger.Debug(logrus.Fields{
+		"user": user,
+	}, "take user on handle login")
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {

@@ -40,6 +40,9 @@ func (u *UserController) Login(c echo.Context) error {
 	}
 
 	accToken, refToken, err := u.userService.HandleLogin(c.Request().Context(), req)
+	if err != nil {
+		return httpresponse.Error(c, message.ErrLogin, err)
+	}
 
 	cookie := &http.Cookie{
 		Value:    refToken,

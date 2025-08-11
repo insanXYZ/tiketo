@@ -13,7 +13,7 @@ func InitLogger() {
 	log = logrus.New()
 	var level logrus.Level
 
-	envLevel := strings.ToLower(os.Getenv("LOG_LEVEL"))
+	envLevel := strings.ToLower(os.Getenv("APP_LOG_LEVEL"))
 	switch envLevel {
 	case "trace":
 		level = logrus.TraceLevel
@@ -46,4 +46,8 @@ func Info(fields logrus.Fields, args ...any) {
 
 func Warn(fields logrus.Fields, args ...any) {
 	log.WithFields(fields).Warn(args...)
+}
+
+func Debug(fields logrus.Fields, args ...any) {
+	log.WithFields(fields).Debug(args...)
 }

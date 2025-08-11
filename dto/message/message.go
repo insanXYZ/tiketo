@@ -3,6 +3,7 @@ package message
 const (
 	ErrBind              = "Invalid request payload"
 	ErrRegister          = "Failed to register user"
+	ErrLogin             = "Failed login"
 	ErrRefresh           = "Failed to refresh access token"
 	ErrGetCurrentUser    = "Failed to retrieve user identity"
 	ErrGetUserTickets    = "Failed to retrieve user tickets"
