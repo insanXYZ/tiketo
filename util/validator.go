@@ -14,14 +14,22 @@ func init() {
 	Validator = validator.New()
 
 	Validator.RegisterValidation("isImage", func(fl validator.FieldLevel) bool {
-		field := fl.Field().Interface().(*multipart.FileHeader)
+		var fh *multipart.FileHeader
 
-		err := sage.Validate(field)
-		if err != nil {
+		switch v := fl.Field().Interface().(type) {
+		case *multipart.FileHeader:
+			fh = v
+		case multipart.FileHeader:
+			fh = &v
+		default:
 			return false
 		}
 
-		return true
+		if fh == nil {
+			return false
+		}
+
+		return sage.Validate(fh) == nil
 	})
 }
 

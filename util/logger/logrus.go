@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -50,4 +51,12 @@ func Warn(fields logrus.Fields, args ...any) {
 
 func Debug(fields logrus.Fields, args ...any) {
 	log.WithFields(fields).Debug(args...)
+}
+
+func DebugMethod(fields logrus.Fields, method string) {
+	Debug(fields, fmt.Sprintf("Entering %s method", method))
+}
+
+func Error(fields logrus.Fields, args ...any) {
+	log.WithFields(fields).Error(args...)
 }

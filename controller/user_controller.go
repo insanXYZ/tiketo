@@ -33,7 +33,6 @@ func (u *UserController) RegisterRoutes(e *echo.Group) {
 
 func (u *UserController) Login(c echo.Context) error {
 	req := new(dto.Login)
-
 	err := c.Bind(req)
 	if err != nil {
 		return httpresponse.Error(c, message.ErrBind, err)
@@ -58,7 +57,6 @@ func (u *UserController) Login(c echo.Context) error {
 	return httpresponse.Success(c, "success login", echo.Map{
 		"access-token": accToken,
 	})
-
 }
 
 func (u *UserController) Register(c echo.Context) error {

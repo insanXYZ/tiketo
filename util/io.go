@@ -1,9 +1,11 @@
 package util
 
 import (
+	"fmt"
 	"io"
 	"mime/multipart"
 	"os"
+	"time"
 )
 
 const (
@@ -18,4 +20,12 @@ func SaveTicketImage(file multipart.File, filename string) error {
 
 	_, err = io.Copy(dst, file)
 	return err
+}
+
+func DeleteTicketImage(filename string) error {
+	return os.Remove(PathTicketImageDir + filename)
+}
+
+func GenerateFilenameTicket(id, ext string) string {
+	return fmt.Sprintf("%s-%s%s", id, time.Now().Format(time.DateTime), ext)
 }

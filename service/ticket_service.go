@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"path/filepath"
 	"tiketo/dto"
 	"tiketo/entity"
 	"tiketo/repository"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/insanXYZ/sage"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
@@ -33,7 +35,7 @@ func (t *TicketService) HandleGetUserTickets(ctx context.Context, claims jwt.Map
 
 	idUser := claims["sub"].(string)
 
-	err := t.ticketRepository.FindUserTickets(ctx, t.db, idUser, tickets)
+	err := t.ticketRepository.FindUserTickets(ctx, t.db, idUser, &tickets)
 	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
 	}
@@ -47,6 +49,11 @@ func (t *TicketService) HandleCreateTicket(ctx context.Context, claims jwt.MapCl
 		return err
 	}
 
+	err = sage.Validate(req.ImageFile)
+	if err != nil {
+		return err
+	}
+
 	file, err := req.ImageFile.Open()
 	if err != nil {
 		return err
@@ -54,19 +61,22 @@ func (t *TicketService) HandleCreateTicket(ctx context.Context, claims jwt.MapCl
 
 	defer file.Close()
 
-	err = util.SaveTicketImage(file, req.ImageFile.Filename)
+	id := uuid.NewString()
+	filename := util.GenerateFilenameTicket(id, filepath.Ext(req.ImageFile.Filename))
+
+	err = util.SaveTicketImage(file, filename)
 	if err != nil {
 		return err
 	}
 
 	ticket := &entity.Ticket{
-		ID:          uuid.NewString(),
+		ID:          id,
 		Name:        req.Name,
 		Description: req.Description,
 		Price:       req.Price,
 		Quantity:    req.Quantity,
 		UserID:      claims["sub"].(string),
-		Image:       req.ImageFile.Filename,
+		Image:       filename,
 	}
 
 	return t.ticketRepository.Create(ctx, t.db, ticket)
@@ -83,8 +93,14 @@ func (t *TicketService) HandleDelete(ctx context.Context, claims jwt.MapClaims, 
 		UserID: claims["sub"].(string),
 	}
 
-	return t.ticketRepository.Delete(ctx, t.db, ticket)
+	err = t.ticketRepository.Take(ctx, t.db, ticket)
+	if err != nil {
+		return err
+	}
 
+	go util.DeleteTicketImage(ticket.Image)
+
+	return t.ticketRepository.Delete(ctx, t.db, ticket)
 }
 
 func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, req *dto.UpdateTicket) error {
@@ -109,7 +125,7 @@ func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, 
 			return err
 		}
 
-		err = util.SaveTicketImage(f, req.ImageFile.Filename)
+		err = util.SaveTicketImage(f, util.GenerateFilenameTicket(ticket.ID, filepath.Ext(req.ImageFile.Filename)))
 		if err != nil {
 			return err
 		}
@@ -117,10 +133,21 @@ func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, 
 		ticket.Image = req.ImageFile.Filename
 	}
 
-	ticket.Name = req.Name
-	ticket.Description = req.Description
-	ticket.Price = req.Price
-	ticket.Quantity = req.Quantity
+	if req.Name != nil {
+		ticket.Name = *req.Name
+	}
+
+	if req.Description != nil {
+		ticket.Description = *req.Description
+	}
+
+	if req.Price != nil {
+		ticket.Price = *req.Price
+	}
+
+	if req.Quantity != nil {
+		ticket.Quantity = *req.Quantity
+	}
 
 	return t.ticketRepository.Save(ctx, t.db, ticket)
 }
@@ -139,7 +166,7 @@ func (t *TicketService) HandleGet(ctx context.Context, req *dto.GetTicket) (*ent
 	return ticket, err
 }
 
-func (t *TicketService) HandleGetAll(ctx context.Context) ([]entity.Ticket, error) {
+func (t *TicketService) HandleGetTickets(ctx context.Context) ([]entity.Ticket, error) {
 	var tickets []entity.Ticket
 
 	err := t.ticketRepository.FindWithUser(ctx, t.db, &tickets)

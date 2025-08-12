@@ -23,6 +23,6 @@ func (t *TicketRepository) FindWithUser(ctx context.Context, db *gorm.DB, dst *[
 	return db.WithContext(ctx).Joins("User").Find(dst).Error
 }
 
-func (t *TicketRepository) FindUserTickets(ctx context.Context, db *gorm.DB, id string, dst []entity.Ticket) error {
+func (t *TicketRepository) FindUserTickets(ctx context.Context, db *gorm.DB, id string, dst *[]entity.Ticket) error {
 	return db.WithContext(ctx).Where("user_id = ?", id).Find(dst).Error
 }

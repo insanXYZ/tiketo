@@ -1,8 +1,8 @@
 package dto
 
 type User struct {
-	Name  string `gorm:"column:name"`
-	Email string `gorm:"column:email"`
+	Name  string `json:"name,omitempty"`
+	Email string `json:"email,omitempty"`
 }
 
 type Login struct {

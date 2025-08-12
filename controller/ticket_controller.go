@@ -23,14 +23,14 @@ func NewTicketController(ticketService *service.TicketService) *TicketController
 }
 
 func (t *TicketController) RegisterRoutes(c *echo.Group) {
-	c.GET("/tickets/:id", t.Get)
-	c.GET("/tickets", t.GetAll)
+	c.GET("/tickets/:id", t.GetTicket)
+	c.GET("/tickets", t.GetTickets)
 
 	hasAcc := c.Group("/me", middleware.HasAccToken)
 	hasAcc.GET("/tickets", t.GetUserTickets)
-	hasAcc.POST("/tickets", t.Create)
-	hasAcc.DELETE("/tickets/:id", t.Delete)
-	hasAcc.PUT("/tickets/:id", t.Update)
+	hasAcc.POST("/tickets", t.CreateTicket)
+	hasAcc.DELETE("/tickets/:id", t.DeleteTicket)
+	hasAcc.PUT("/tickets/:id", t.UpdateTicket)
 }
 
 func (t *TicketController) GetUserTickets(c echo.Context) error {
@@ -44,7 +44,7 @@ func (t *TicketController) GetUserTickets(c echo.Context) error {
 	return httpresponse.Success(c, message.SuccessGetUserTickets, converter.TicketEntitiesToDto(tickets))
 }
 
-func (t *TicketController) Get(c echo.Context) error {
+func (t *TicketController) GetTicket(c echo.Context) error {
 	req := new(dto.GetTicket)
 	err := c.Bind(req)
 	if err != nil {
@@ -58,8 +58,8 @@ func (t *TicketController) Get(c echo.Context) error {
 	return httpresponse.Success(c, message.SuccessGetTicket, converter.TicketEntityToDto(ticket))
 }
 
-func (t *TicketController) GetAll(c echo.Context) error {
-	tickets, err := t.ticketService.HandleGetAll(c.Request().Context())
+func (t *TicketController) GetTickets(c echo.Context) error {
+	tickets, err := t.ticketService.HandleGetTickets(c.Request().Context())
 	if err != nil {
 		return httpresponse.Error(c, message.ErrGetTickets, err)
 	}
@@ -67,7 +67,7 @@ func (t *TicketController) GetAll(c echo.Context) error {
 	return httpresponse.Success(c, message.SuccessGetTickets, converter.TicketEntitiesToDto(tickets))
 }
 
-func (t *TicketController) Create(c echo.Context) error {
+func (t *TicketController) CreateTicket(c echo.Context) error {
 	claims := c.Get("user").(jwt.MapClaims)
 	req := new(dto.CreateTicket)
 
@@ -91,7 +91,7 @@ func (t *TicketController) Create(c echo.Context) error {
 	return httpresponse.Success(c, message.SuccessCreateTicket, nil)
 }
 
-func (t *TicketController) Delete(c echo.Context) error {
+func (t *TicketController) DeleteTicket(c echo.Context) error {
 	claims := c.Get("user").(jwt.MapClaims)
 	req := new(dto.DeleteTicket)
 
@@ -108,7 +108,7 @@ func (t *TicketController) Delete(c echo.Context) error {
 	return httpresponse.Success(c, message.SuccessDeleteTicket, nil)
 }
 
-func (t *TicketController) Update(c echo.Context) error {
+func (t *TicketController) UpdateTicket(c echo.Context) error {
 	claims := c.Get("user").(jwt.MapClaims)
 	req := new(dto.UpdateTicket)
 

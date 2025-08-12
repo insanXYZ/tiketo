@@ -5,22 +5,22 @@ import (
 )
 
 type Ticket struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
+	ID          string `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	Description string `json:"description,omitempty"`
 	Price       int    `json:"price"`
 	Image       string `json:"image"`
-	Quantity    int    `json:"quantity"`
-	CreatedAt   string `json:"created_at"`
-	User        *User  `json:"created_by"`
+	Quantity    int    `json:"quantity,omitempty"`
+	CreatedAt   string `json:"created_at,omitempty"`
+	User        *User  `json:"created_by,omitempty"`
 }
 
 type CreateTicket struct {
-	Name        string                `json:"name" validate:"required,min=3"`
-	Description string                `json:"description" validate:"required,min=3"`
-	Price       int                   `json:"price" validate:"required"`
-	Quantity    int                   `json:"quantity" validate:"required"`
-	ImageFile   *multipart.FileHeader `json:"-" validate:"isImage"`
+	Name        string                `json:"name" form:"name" validate:"required,min=3"`
+	Description string                `json:"description" form:"description" validate:"required,min=3"`
+	Price       int                   `json:"price" form:"price" validate:"required"`
+	Quantity    int                   `json:"quantity" form:"quantity" validate:"required"`
+	ImageFile   *multipart.FileHeader `validate:"isImage"`
 }
 
 type DeleteTicket struct {
@@ -33,9 +33,9 @@ type GetTicket struct {
 
 type UpdateTicket struct {
 	ID          string                `param:"id"`
-	Name        string                `json:"name" validate:"omitempty,min=3,max=100"`
-	Description string                `json:"description" validate:"omitempty,min=3,max=255"`
-	Price       int                   `json:"price"`
-	Quantity    int                   `json:"quantity"`
+	Name        *string               `json:"name" validate:"omitempty,min=3,max=100"`
+	Description *string               `json:"description" validate:"omitempty,min=3,max=255"`
+	Price       *int                  `json:"price"`
+	Quantity    *int                  `json:"quantity"`
 	ImageFile   *multipart.FileHeader `json:"-" validate:"omitempty,isImage"`
 }

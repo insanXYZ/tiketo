@@ -7,13 +7,11 @@ import (
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
-	"tiketo/util/logger"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -38,15 +36,10 @@ const (
 )
 
 func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken, refToken string, err error) {
-
 	err = util.Validator.Struct(req)
 	if err != nil {
 		return
 	}
-
-	logger.Debug(logrus.Fields{
-		"req": req,
-	}, "req login on handle login")
 
 	user := &entity.User{
 		Email: req.Email,
@@ -56,10 +49,6 @@ func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken
 	if err != nil {
 		return
 	}
-
-	logger.Debug(logrus.Fields{
-		"user": user,
-	}, "take user on handle login")
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
@@ -98,7 +87,7 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 
 	err = u.userRepository.Take(ctx, u.db, user)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return err // error email was used
+		return err
 	}
 
 	b, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -111,7 +100,6 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 	user.Password = string(b)
 
 	return u.userRepository.Create(ctx, u.db, user)
-
 }
 
 func (u *UserService) HandleRefresh(ctx context.Context, claims jwt.MapClaims) (string, error) {
