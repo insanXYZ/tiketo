@@ -1,7 +1,6 @@
 package dto
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -10,7 +9,7 @@ type Order struct {
 	Status      string       `json:"status,omitempty"`
 	Total       int          `json:"total,omitempty"`
 	CreatedAt   time.Time    `json:"created_at"`
-	PaidAt      sql.NullTime `json:"paid_at"`
+	PaidAt      *time.Time   `json:"paid_at,omitempty"`
 	OrderDetail *OrderDetail `json:"order_detail,omitempty"`
 }
 

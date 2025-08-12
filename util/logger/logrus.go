@@ -34,6 +34,7 @@ func InitLogger() {
 		level = logrus.InfoLevel
 	}
 
+	log.SetFormatter(&logrus.JSONFormatter{})
 	log.SetLevel(level)
 }
 
@@ -53,8 +54,16 @@ func Debug(fields logrus.Fields, args ...any) {
 	log.WithFields(fields).Debug(args...)
 }
 
-func DebugMethod(fields logrus.Fields, method string) {
-	Debug(fields, fmt.Sprintf("Entering %s method", method))
+func EnteringMethod(method string) func() {
+	Info(nil, fmt.Sprintf("Entering %s method", method))
+
+	return func() {
+		Info(nil, fmt.Sprintf("Exit %s method", method))
+	}
+}
+
+func WarnMethod(method string, err error) {
+	Warn(nil, fmt.Sprintf("Operation encountered on %s method :", method), err.Error())
 }
 
 func Error(fields logrus.Fields, args ...any) {

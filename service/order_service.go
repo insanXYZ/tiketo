@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"crypto/sha512"
+	"encoding/hex"
 	"errors"
 	"os"
 	"slices"
@@ -11,12 +12,15 @@ import (
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
+	"tiketo/util/logger"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
 	"github.com/redis/go-redis/v9"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -41,44 +45,69 @@ func NewOrderService(orderRepository *repository.OrderRepository, orderDetailRep
 }
 
 func (o *OrderService) HandleAfterPayment(ctx context.Context, req *dto.AfterPayment) error {
+	logger.EnteringMethod("OrderService.HandleAfterPayment")
 	err := util.ValidateStruct(req)
 	if err != nil {
 		return err
 	}
 
+	logger.Debug(logrus.Fields{
+		"req": req,
+	}, "Success retrieve request on OrderService.HandleAfterPayment")
+
 	validTransactionStatus := []string{"capture", "settlement"}
 
-	if slices.Contains(validTransactionStatus, req.TransactionStatus) {
-		s := sha512.New()
-		s.Write([]byte(req.OrderId + req.StatusCode + req.GrossAmount + os.Getenv("MIDTRANS_SERVER_KEY")))
+	if !slices.Contains(validTransactionStatus, req.TransactionStatus) {
+		return errors.New(message.ErrTransactionStatus)
+	}
 
-		calSignatureKey := s.Sum(nil)
+	s := sha512.New()
+	s.Write([]byte(req.OrderId + req.StatusCode + req.GrossAmount + os.Getenv("MIDTRANS_SERVER_KEY")))
 
-		if string(calSignatureKey) != req.SignatureKey {
-			return errors.New(message.ErrSignatureKey)
-		}
+	byteSignatureKey := hex.EncodeToString(s.Sum(nil))
 
+	if string(byteSignatureKey) != req.SignatureKey {
+		return errors.New(message.ErrSignatureKey)
+	}
+
+	err = o.db.Transaction(func(tx *gorm.DB) error {
 		order := &entity.Order{
 			ID: req.OrderId,
 		}
 
-		err := o.orderRepository.Take(ctx, o.db, order)
+		err = o.orderRepository.TakeWithDetailOrder(ctx, tx, order)
 		if err != nil {
 			return err
 		}
+
+		now := time.Now()
 
 		order.Status = entity.Paid
-
-		err = o.orderRepository.Save(ctx, o.db, order)
+		order.PaidAt = &now
+		err = o.orderRepository.Save(ctx, tx, order)
 		if err != nil {
 			return err
 		}
-	}
 
-	return errors.New(message.ErrTransactionStatus)
+		ticket := &entity.Ticket{
+			ID: order.OrderDetail.TicketId,
+		}
+
+		err = o.ticketRepository.Take(ctx, tx, ticket)
+		if err != nil {
+			return err
+		}
+
+		ticket.Quantity = ticket.Quantity - int(order.OrderDetail.Quantity)
+
+		return o.ticketRepository.Save(ctx, tx, ticket)
+	})
+
+	return err
 }
 
 func (o *OrderService) HandleGetHistoryOrder(ctx context.Context, claims jwt.MapClaims, req *dto.GetOrder) (*entity.Order, error) {
+	logger.EnteringMethod("OrderService.HandleGetHistoryOrder")
 	order := &entity.Order{
 		ID:     req.TicketID,
 		UserID: claims["sub"].(string),
@@ -100,7 +129,7 @@ func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, r
 		user := &entity.User{
 			ID: claims["sub"].(string),
 		}
-		err = o.userRepository.Take(ctx, tx, user)
+		err := o.userRepository.Take(ctx, tx, user)
 		if err != nil {
 			return err
 		}
@@ -109,9 +138,13 @@ func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, r
 			ID: req.TicketID,
 		}
 
-		err = o.ticketRepository.Take(ctx, tx, ticket)
+		err = o.ticketRepository.TakeForUpdate(ctx, tx, ticket)
 		if err != nil {
 			return err
+		}
+
+		if ticket.Quantity < req.Quantity {
+			return errors.New(message.ErrQuantityOrder)
 		}
 
 		total := req.Quantity * ticket.Price
@@ -167,9 +200,13 @@ func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, r
 			Items:              items,
 		}
 
-		snapResponse, err = snapClient.CreateTransaction(snapReq)
-		return err
+		res, errSnap := snapClient.CreateTransaction(snapReq)
+		if errSnap != nil {
+			return errSnap
+		}
 
+		snapResponse = res
+		return nil
 	})
 
 	return snapResponse, err
@@ -179,6 +216,6 @@ func (o *OrderService) HandleGetHistoryOrders(ctx context.Context, claims jwt.Ma
 	var orders []entity.Order
 	idUser := claims["sub"].(string)
 
-	err := o.orderRepository.FindAllHistoryUser(ctx, o.db, &orders, idUser)
+	err := o.orderRepository.FindAllOrderHistoryUser(ctx, o.db, &orders, idUser)
 	return orders, err
 }

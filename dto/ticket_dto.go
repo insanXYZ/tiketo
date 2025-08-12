@@ -31,6 +31,10 @@ type GetTicket struct {
 	Id string `param:"id" validate:"required"`
 }
 
+type GetTIckets struct {
+	Page int `query:"page"`
+}
+
 type UpdateTicket struct {
 	ID          string                `param:"id"`
 	Name        *string               `json:"name" validate:"omitempty,min=3,max=100"`

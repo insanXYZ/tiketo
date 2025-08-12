@@ -67,6 +67,7 @@ func main() {
 
 	logger.Info(nil, "Register all route")
 	api := e.Group("/api")
+	e.Static("/assets", "assets")
 	userController.RegisterRoutes(api)
 	ticketController.RegisterRoutes(api)
 	orderController.RegisterRoutes(api)

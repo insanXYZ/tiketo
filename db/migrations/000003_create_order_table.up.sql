@@ -1,4 +1,4 @@
-CREATE TYPE status AS ENUM ('unpaid','paid','cancel');
+CREATE TYPE status AS ENUM ('unpaid','paid');
 
 CREATE TABLE IF NOT EXISTS orders (
   id VARCHAR(100) NOT NULL,

@@ -2,11 +2,14 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"tiketo/dto"
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
+	"tiketo/util/logger"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -36,6 +39,7 @@ const (
 )
 
 func (u *UserService) HandleLogin(ctx context.Context, req *dto.Login) (accToken, refToken string, err error) {
+	logger.EnteringMethod("UserService.HandleLogin")
 	err = util.Validator.Struct(req)
 	if err != nil {
 		return
@@ -115,10 +119,35 @@ func (u *UserService) HandleRefresh(ctx context.Context, claims jwt.MapClaims) (
 
 func (u *UserService) HandleGetCurrentUser(ctx context.Context, claims jwt.MapClaims) (*entity.User, error) {
 
+	key := fmt.Sprintf("user-%s", claims["sub"].(string))
+
+	val, err := u.redis.Get(ctx, key).Bytes()
+	if err == nil {
+		logger.Info(nil, "Retrieve user from redis")
+
+		dst := new(entity.User)
+		if err := json.Unmarshal(val, dst); err == nil {
+			return dst, nil
+		}
+	}
+
 	user := &entity.User{
 		ID: claims["sub"].(string),
 	}
 
-	err := u.userRepository.Take(ctx, u.db, user)
-	return user, err
+	err = u.userRepository.Take(ctx, u.db, user)
+	if err != nil {
+		return nil, err
+	}
+
+	expSetUser := time.Duration(5 * time.Minute)
+
+	logger.Info(nil, "Trying set user to redis")
+
+	err = u.redis.Set(ctx, key, user, expSetUser).Err()
+	if err != nil {
+		logger.Warn(nil, "Err redis set on UserService.HandleGetCurrentUser :", err.Error())
+	}
+
+	return user, nil
 }

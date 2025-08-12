@@ -166,9 +166,9 @@ func (t *TicketService) HandleGet(ctx context.Context, req *dto.GetTicket) (*ent
 	return ticket, err
 }
 
-func (t *TicketService) HandleGetTickets(ctx context.Context) ([]entity.Ticket, error) {
+func (t *TicketService) HandleGetTickets(ctx context.Context, req *dto.GetTIckets) ([]entity.Ticket, error) {
 	var tickets []entity.Ticket
 
-	err := t.ticketRepository.FindWithUser(ctx, t.db, &tickets)
+	err := t.ticketRepository.FindPagingWithJoinUser(ctx, t.db, &tickets, req.Page)
 	return tickets, err
 }

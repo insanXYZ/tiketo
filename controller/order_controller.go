@@ -7,6 +7,7 @@ import (
 	"tiketo/middleware"
 	"tiketo/service"
 	"tiketo/util/httpresponse"
+	"tiketo/util/logger"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
@@ -23,21 +24,25 @@ func NewOrderController(orderService *service.OrderService) *OrderController {
 }
 
 func (o *OrderController) RegisterRoutes(e *echo.Group) {
+	e.POST("/orders/callback", o.AfterPayment)
 	e.POST("/orders", o.CreateOrder, middleware.HasAccToken)
 	e.GET("/me/orders", o.GetHistoryOrders, middleware.HasAccToken)
 	e.GET("/me/orders/:id", o.GetHistoryOrder, middleware.HasAccToken)
-	e.POST("/orders/callback", o.AfterPayment)
 }
 
 func (o *OrderController) AfterPayment(c echo.Context) error {
+	logger.EnteringMethod("OrderController.AfterPayment")
+
 	req := new(dto.AfterPayment)
 	err := c.Bind(req)
 	if err != nil {
+		logger.Warn(nil, "Err bind :", err.Error())
 		return httpresponse.Error(c, message.ErrBind, err)
 	}
 
 	err = o.orderService.HandleAfterPayment(c.Request().Context(), req)
 	if err != nil {
+		logger.Warn(nil, "Err HandleAfterPayment :", err.Error())
 		return httpresponse.Error(c, message.ErrPaymentProcess, err)
 	}
 

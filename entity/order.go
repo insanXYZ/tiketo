@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"database/sql"
 	"time"
 )
 
@@ -10,7 +9,6 @@ type Status string
 const (
 	Unpaid Status = "unpaid"
 	Paid   Status = "paid"
-	Cancel Status = "cancel"
 )
 
 type Order struct {
@@ -19,7 +17,7 @@ type Order struct {
 	UserID      string       `gorm:"column:user_id"`
 	Total       int          `gorm:"column:total"`
 	CreatedAt   time.Time    `gorm:"column:created_at;autoCreateTime"`
-	PaidAt      sql.NullTime `gorm:"column:paid_at"`
+	PaidAt      *time.Time   `gorm:"column:paid_at"`
 	OrderDetail *OrderDetail `gorm:"foreignKey:order_id;references:id"`
 	User        *User        `gorm:"foreignKey:user_id;references:id"`
 }

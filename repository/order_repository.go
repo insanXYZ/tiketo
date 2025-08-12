@@ -15,10 +15,10 @@ func NewOrderRepository() *OrderRepository {
 	return &OrderRepository{}
 }
 
-func (o *OrderRepository) FindAllHistoryUser(ctx context.Context, db *gorm.DB, dst *[]entity.Order, id string) error {
+func (o *OrderRepository) FindAllOrderHistoryUser(ctx context.Context, db *gorm.DB, dst *[]entity.Order, id string) error {
 	return db.WithContext(ctx).Where("user_id = ?", id).Joins("OrderDetail").Find(dst).Error
 }
 
 func (o *OrderRepository) TakeWithDetailOrder(ctx context.Context, db *gorm.DB, dst *entity.Order) error {
-	return db.WithContext(ctx).Joins("OrderDetail").Take(dst).Error
+	return db.WithContext(ctx).Joins("OrderDetail").Where(dst).Take(dst).Error
 }

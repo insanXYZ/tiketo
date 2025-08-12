@@ -59,7 +59,13 @@ func (t *TicketController) GetTicket(c echo.Context) error {
 }
 
 func (t *TicketController) GetTickets(c echo.Context) error {
-	tickets, err := t.ticketService.HandleGetTickets(c.Request().Context())
+	req := new(dto.GetTIckets)
+	err := c.Bind(req)
+	if err != nil {
+		return httpresponse.Error(c, message.ErrBind, err)
+	}
+
+	tickets, err := t.ticketService.HandleGetTickets(c.Request().Context(), req)
 	if err != nil {
 		return httpresponse.Error(c, message.ErrGetTickets, err)
 	}
