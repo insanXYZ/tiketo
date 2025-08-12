@@ -1,7 +1,10 @@
 package middleware
 
 import (
+	"net/http"
 	"os"
+	"tiketo/dto/message"
+	"tiketo/util/httpresponse"
 
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
@@ -11,29 +14,42 @@ import (
 var HasAccToken, HasRefToken echo.MiddlewareFunc
 
 func InitMiddleware() {
-	HasAccToken = buildJwtMiddleware(os.Getenv("ACC_JWT_SECRET"), withTokenLookup("header:Authorization"))
-	HasRefToken = buildJwtMiddleware(os.Getenv("REF_JWT_SECRET"), withTokenLookup("header:cookie:refresh-token"))
-}
-
-type Option func(*echojwt.Config)
-
-func withTokenLookup(token string) Option {
-	return func(e *echojwt.Config) {
-		e.TokenLookup = token
-	}
-}
-
-func buildJwtMiddleware(key string, options ...Option) echo.MiddlewareFunc {
-	cfg := echojwt.Config{
-		SigningKey: []byte(key),
+	HasAccToken = echojwt.WithConfig(echojwt.Config{
+		SigningKey: []byte(os.Getenv("ACC_JWT_SECRET")),
 		SuccessHandler: func(c echo.Context) {
 			c.Set("user", c.Get("user").(*jwt.Token).Claims.(jwt.MapClaims))
 		},
-	}
+		TokenLookup: "header:Authorization",
+	})
 
-	for _, v := range options {
-		v(&cfg)
-	}
+	HasRefToken = func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			reftoken, err := c.Cookie("refresh-token")
+			if err != nil {
+				return httpresponse.Error(c, message.ErrMalformedJwt, nil, http.StatusUnauthorized)
+			}
 
-	return echojwt.WithConfig(cfg)
+			token, err := jwt.Parse(reftoken.Value, func(t *jwt.Token) (any, error) {
+				if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+					return nil, echojwt.ErrJWTInvalid
+				}
+
+				return []byte(os.Getenv("REF_JWT_SECRET")), nil
+			})
+
+			if err != nil {
+				return httpresponse.Error(c, message.ErrExpiredJwt, nil, http.StatusUnauthorized)
+			}
+
+			claims, ok := token.Claims.(jwt.MapClaims)
+
+			if !ok {
+				return httpresponse.Error(c, message.ErrExpiredJwt, nil, http.StatusUnauthorized)
+			}
+
+			c.Set("user", claims)
+
+			return next(c)
+		}
+	}
 }

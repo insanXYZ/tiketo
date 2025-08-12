@@ -19,6 +19,8 @@ const (
 	ErrPaymentProcess    = "Failed process payment"
 	ErrTransactionStatus = "Invalid transaction status"
 	ErrSignatureKey      = "Invalid signature key"
+	ErrMalformedJwt      = "Missing or malformed jwt"
+	ErrExpiredJwt        = "Invalid or expired jwt"
 )
 
 const (
