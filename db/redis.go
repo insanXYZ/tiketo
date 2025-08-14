@@ -4,8 +4,13 @@ import (
 	"context"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/redis/go-redis/v9"
+)
+
+const (
+	ExpRedis = time.Duration(5 * time.Minute)
 )
 
 func NewRedisClient() (*redis.Client, error) {

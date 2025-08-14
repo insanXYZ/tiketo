@@ -51,11 +51,11 @@ func (t *TicketController) GetTicket(c echo.Context) error {
 		return httpresponse.Error(c, message.ErrBind, err)
 	}
 
-	ticket, err := t.ticketService.HandleGet(c.Request().Context(), req)
+	ticket, err := t.ticketService.HandleGetTicket(c.Request().Context(), req)
 	if err != nil {
 		return httpresponse.Error(c, message.ErrGetTicket, err)
 	}
-	return httpresponse.Success(c, message.SuccessGetTicket, converter.TicketEntityToDto(ticket))
+	return httpresponse.Success(c, message.SuccessGetTickets, converter.TicketEntityToDto(ticket))
 }
 
 func (t *TicketController) GetTickets(c echo.Context) error {

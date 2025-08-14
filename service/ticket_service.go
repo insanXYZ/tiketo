@@ -2,12 +2,17 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"path/filepath"
+	"tiketo/db"
 	"tiketo/dto"
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
+	"tiketo/util/logger"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -100,7 +105,15 @@ func (t *TicketService) HandleDelete(ctx context.Context, claims jwt.MapClaims, 
 
 	go util.DeleteTicketImage(ticket.Image)
 
-	return t.ticketRepository.Delete(ctx, t.db, ticket)
+	err = t.ticketRepository.Delete(ctx, t.db, ticket)
+	if err != nil {
+		return err
+	}
+
+	key := fmt.Sprintf("ticket-%s", ticket.ID)
+	t.redis.Del(ctx, key)
+
+	return nil
 }
 
 func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, req *dto.UpdateTicket) error {
@@ -149,13 +162,31 @@ func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, 
 		ticket.Quantity = *req.Quantity
 	}
 
-	return t.ticketRepository.Save(ctx, t.db, ticket)
+	err = t.ticketRepository.Save(ctx, t.db, ticket)
+	if err != nil {
+		return err
+	}
+
+	key := fmt.Sprintf("ticket-%s", req.ID)
+	t.redis.Set(ctx, key, ticket, db.ExpRedis)
+
+	return nil
 }
 
-func (t *TicketService) HandleGet(ctx context.Context, req *dto.GetTicket) (*entity.Ticket, error) {
+func (t *TicketService) HandleGetTicket(ctx context.Context, req *dto.GetTicket) (*entity.Ticket, error) {
 	err := util.ValidateStruct(req)
 	if err != nil {
 		return nil, err
+	}
+
+	key := fmt.Sprintf("ticket=%s", req.Id)
+
+	b, err := t.redis.Get(ctx, key).Bytes()
+	if err == nil {
+		ticket := new(entity.Ticket)
+		if err := json.Unmarshal(b, ticket); err == nil {
+			return ticket, nil
+		}
 	}
 
 	ticket := &entity.Ticket{
@@ -163,7 +194,18 @@ func (t *TicketService) HandleGet(ctx context.Context, req *dto.GetTicket) (*ent
 	}
 
 	err = t.ticketRepository.TakeWithUser(ctx, t.db, ticket)
-	return ticket, err
+	if err != nil {
+		return nil, err
+	}
+
+	expSetTicket := time.Duration(5 * time.Minute)
+
+	err = t.redis.Set(ctx, key, ticket, expSetTicket).Err()
+	if err != nil {
+		logger.Warn(nil, "Err set redis on TicketService.HandleGetTicket")
+	}
+
+	return ticket, nil
 }
 
 func (t *TicketService) HandleGetTickets(ctx context.Context, req *dto.GetTIckets) ([]entity.Ticket, error) {

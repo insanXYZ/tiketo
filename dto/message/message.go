@@ -21,10 +21,7 @@ const (
 	ErrSignatureKey      = "Invalid signature key"
 	ErrMalformedJwt      = "Missing or malformed jwt"
 	ErrExpiredJwt        = "Invalid or expired jwt"
-<<<<<<< HEAD
-=======
 	ErrQuantityOrder     = "Failed to create order, the number of orders exceeds the number of tickets"
->>>>>>> c75ab72 (fix after payment status)
 )
 
 const (

@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -15,4 +16,12 @@ type Ticket struct {
 	CreatedAt   time.Time `gorm:"column:created_at;autoCreateTime"`
 	UpdatedAt   time.Time `gorm:"column:updated_at;autoCreateTime;autoUpdateTime"`
 	User        *User     `gorm:"foreignKey:user_id;references:id"`
+}
+
+func (t *Ticket) MarshalBinary() (data []byte, err error) {
+	return json.Marshal(t)
+}
+
+func (t *Ticket) UnmarshalBinary(data []byte) error {
+	return json.Unmarshal(data, t)
 }
