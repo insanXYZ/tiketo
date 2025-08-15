@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"tiketo/db"
 	"tiketo/dto"
 	"tiketo/entity"
 	"tiketo/repository"
@@ -14,18 +15,24 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
-type UserService struct {
-	userRepository *repository.UserRepository
-	db             *gorm.DB
-	redis          *redis.Client
+type UserServiceInterface interface {
+	HandleLogin(context.Context, *dto.Login) (string, string, error)
+	HandleRegister(context.Context, *dto.Register) error
+	HandleRefresh(context.Context, jwt.MapClaims) (string, error)
+	HandleGetCurrentUser(context.Context, jwt.MapClaims) (*entity.User, error)
 }
 
-func NewUserService(userRepository *repository.UserRepository, db *gorm.DB, redis *redis.Client) *UserService {
+type UserService struct {
+	userRepository repository.UserRepositoryInterface
+	db             *gorm.DB
+	redis          db.RedisInterface
+}
+
+func NewUserService(userRepository repository.UserRepositoryInterface, db *gorm.DB, redis db.RedisInterface) *UserService {
 	return &UserService{
 		userRepository: userRepository,
 		db:             db,
@@ -121,7 +128,7 @@ func (u *UserService) HandleGetCurrentUser(ctx context.Context, claims jwt.MapCl
 
 	key := fmt.Sprintf("user-%s", claims["sub"].(string))
 
-	val, err := u.redis.Get(ctx, key).Bytes()
+	val, err := u.redis.Get(ctx, key)
 	if err == nil {
 		logger.Info(nil, "Retrieve user from redis")
 
@@ -144,7 +151,7 @@ func (u *UserService) HandleGetCurrentUser(ctx context.Context, claims jwt.MapCl
 
 	logger.Info(nil, "Trying set user to redis")
 
-	err = u.redis.Set(ctx, key, user, expSetUser).Err()
+	err = u.redis.Set(ctx, key, user, expSetUser)
 	if err != nil {
 		logger.Warn(nil, "Err redis set on UserService.HandleGetCurrentUser :", err.Error())
 	}

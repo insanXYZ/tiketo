@@ -8,10 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var log *logrus.Logger
+var log = logrus.New()
 
 func InitLogger() {
-	log = logrus.New()
 	var level logrus.Level
 
 	envLevel := strings.ToLower(os.Getenv("APP_LOG_LEVEL"))
@@ -31,7 +30,7 @@ func InitLogger() {
 	case "panic":
 		level = logrus.PanicLevel
 	default:
-		level = logrus.InfoLevel
+		level = logrus.ErrorLevel
 	}
 
 	log.SetFormatter(&logrus.JSONFormatter{})

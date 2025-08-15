@@ -8,6 +8,15 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+type RepositoryInterface[T any] interface {
+	Create(context.Context, *gorm.DB, T) error
+	Take(context.Context, *gorm.DB, T) error
+	TakeForUpdate(context.Context, *gorm.DB, T) error
+	Delete(context.Context, *gorm.DB, T) error
+	Save(context.Context, *gorm.DB, T) error
+	Update(context.Context, *gorm.DB, T) error
+}
+
 type Repository[T any] struct {
 }
 

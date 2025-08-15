@@ -8,6 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type TicketRepositoryInterface interface {
+	Repository[*entity.Ticket]
+	TakeWithUser(context.Context, *gorm.DB, *entity.Ticket) error
+	FindPagingWithJoinUser(context.Context, *gorm.DB, *[]entity.Ticket, int) error
+	FindUserTickets(context.Context, *gorm.DB, string, *[]entity.Ticket) error
+}
+
 type TicketRepository struct {
 	Repository[*entity.Ticket]
 }

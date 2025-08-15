@@ -1,0 +1,22 @@
+packages:
+  tiketo/repository:
+    config:
+      all: true
+    interfaces:
+      OrderDetailRepositoryInterface:
+        config:
+          filename: order_detail_repository_mock.go
+          structname: MockOrderDetailRepository
+      OrderRepositoryInterface:
+        config:
+          filename: order_repository_mock.go
+          structname: MockOrderRepository
+      TicketRepositoryInterface:
+        config:
+          filename: ticket_repository_mock.go
+          structname: MockTicketRepository
+      UserRepositoryInterface:
+        config:
+          filename: user_repository_mock.go
+          structname: MockUserRepository
+

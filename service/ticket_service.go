@@ -17,17 +17,25 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/insanXYZ/sage"
-	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
+
+type TicketServiceInterface interface {
+	HandleGetUserTickets(context.Context, jwt.MapClaims) ([]entity.Ticket, error)
+	HandleCreateTicket(context.Context, jwt.MapClaims, *dto.CreateTicket) error
+	HandleDelete(context.Context, jwt.MapClaims, *dto.DeleteTicket) error
+	HandleUpdate(context.Context, jwt.MapClaims, *dto.UpdateTicket) error
+	HandleGetTicket(context.Context, *dto.GetTicket) (*entity.Ticket, error)
+	HandleGetTickets(context.Context, *dto.GetTIckets) ([]entity.Ticket, error)
+}
 
 type TicketService struct {
 	ticketRepository *repository.TicketRepository
 	db               *gorm.DB
-	redis            *redis.Client
+	redis            db.RedisInterface
 }
 
-func NewTicketService(repository *repository.TicketRepository, db *gorm.DB, redis *redis.Client) *TicketService {
+func NewTicketService(repository *repository.TicketRepository, db *gorm.DB, redis db.RedisInterface) *TicketService {
 	return &TicketService{
 		ticketRepository: repository,
 		db:               db,
@@ -181,7 +189,7 @@ func (t *TicketService) HandleGetTicket(ctx context.Context, req *dto.GetTicket)
 
 	key := fmt.Sprintf("ticket=%s", req.Id)
 
-	b, err := t.redis.Get(ctx, key).Bytes()
+	b, err := t.redis.Get(ctx, key)
 	if err == nil {
 		ticket := new(entity.Ticket)
 		if err := json.Unmarshal(b, ticket); err == nil {
@@ -200,7 +208,7 @@ func (t *TicketService) HandleGetTicket(ctx context.Context, req *dto.GetTicket)
 
 	expSetTicket := time.Duration(5 * time.Minute)
 
-	err = t.redis.Set(ctx, key, ticket, expSetTicket).Err()
+	err = t.redis.Set(ctx, key, ticket, expSetTicket)
 	if err != nil {
 		logger.Warn(nil, "Err set redis on TicketService.HandleGetTicket")
 	}

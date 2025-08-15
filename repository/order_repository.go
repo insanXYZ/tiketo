@@ -7,6 +7,12 @@ import (
 	"gorm.io/gorm"
 )
 
+type OrderRepositoryInterface interface {
+	RepositoryInterface[*entity.Order]
+	FindAllOrderHistoryUser(context.Context, *gorm.DB, *[]entity.Order, string) error
+	TakeWithDetailOrder(context.Context, *gorm.DB, *entity.Order) error
+}
+
 type OrderRepository struct {
 	Repository[*entity.Order]
 }

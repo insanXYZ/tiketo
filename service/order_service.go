@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"slices"
+	"tiketo/db"
 	"tiketo/dto"
 	"tiketo/dto/message"
 	"tiketo/entity"
@@ -19,21 +20,26 @@ import (
 	"github.com/google/uuid"
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/snap"
-	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
+
+type OrderServiceInterface interface {
+	HandleAfterPayment(context.Context, *dto.AfterPayment) error
+	HandleGetHistoryOrder(context.Context, jwt.MapClaims, *dto.GetOrder) (*entity.Order, error)
+	HandleGetHistoryOrders(context.Context, jwt.MapClaims) ([]entity.Order, error)
+}
 
 type OrderService struct {
 	orderRepository       *repository.OrderRepository
 	ticketRepository      *repository.TicketRepository
 	orderDetailRepository *repository.OrderDetailRepository
 	userRepository        *repository.UserRepository
-	redis                 *redis.Client
+	redis                 db.RedisInterface
 	db                    *gorm.DB
 }
 
-func NewOrderService(orderRepository *repository.OrderRepository, orderDetailRepository *repository.OrderDetailRepository, userRepository *repository.UserRepository, ticketRepository *repository.TicketRepository, redis *redis.Client, db *gorm.DB) *OrderService {
+func NewOrderService(orderRepository *repository.OrderRepository, orderDetailRepository *repository.OrderDetailRepository, userRepository *repository.UserRepository, ticketRepository *repository.TicketRepository, redis db.RedisInterface, db *gorm.DB) *OrderService {
 	return &OrderService{
 		orderDetailRepository: orderDetailRepository,
 		userRepository:        userRepository,
