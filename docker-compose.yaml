@@ -1,0 +1,32 @@
+services:
+  tiketo_app:
+    container_name: tiketo_app
+    build:
+      context: .
+      Dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      APP_PORT: :8080
+      APP_LOG_LEVEL: error
+      PG_HOST: 
+      PG_USER: 
+      PG_PASSWORD: 
+      PG_SSL_MODE: 
+      PG_NAME: 
+      PG_PORT: 
+      REDIS_ADDRESS: 
+      REDIS_PASSWORD:
+      REDIS_DB: 
+      ACC_JWT_SECRET: 
+      REF_JWT_SECRET: 
+      MIDTRANS_SERVER_KEY:
+  redis:
+    container_name: redis
+    image: redis:latest
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_DB:
+      POSTGRES_PASSWORD: 
