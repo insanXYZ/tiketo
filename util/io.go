@@ -5,6 +5,7 @@ import (
 	"io"
 	"mime/multipart"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -12,14 +13,11 @@ const (
 	PathTicketImageDir = "assets/image/ticket/"
 )
 
-func SaveTicketImage(file multipart.File, filename string) error {
-	dst, err := os.Create(PathTicketImageDir + filename)
-	if err != nil {
-		return err
+func SaveTicketImage(file multipart.File, filename string) {
+	dst, err := os.Create(filepath.Join(PathTicketImageDir, filename))
+	if err == nil {
+		io.Copy(dst, file)
 	}
-
-	_, err = io.Copy(dst, file)
-	return err
 }
 
 func DeleteTicketImage(filename string) error {

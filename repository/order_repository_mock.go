@@ -486,6 +486,69 @@ func (_c *MockOrderRepository_TakeWithDetailOrder_Call) RunAndReturn(run func(co
 	return _c
 }
 
+// Transaction provides a mock function for the type MockOrderRepository
+func (_mock *MockOrderRepository) Transaction(context1 context.Context, dB *gorm.DB, fn func(*gorm.DB) error) error {
+	ret := _mock.Called(context1, dB, fn)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Transaction")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, func(*gorm.DB) error) error); ok {
+		r0 = returnFunc(context1, dB, fn)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockOrderRepository_Transaction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Transaction'
+type MockOrderRepository_Transaction_Call struct {
+	*mock.Call
+}
+
+// Transaction is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - fn func(*gorm.DB) error
+func (_e *MockOrderRepository_Expecter) Transaction(context1 interface{}, dB interface{}, fn interface{}) *MockOrderRepository_Transaction_Call {
+	return &MockOrderRepository_Transaction_Call{Call: _e.mock.On("Transaction", context1, dB, fn)}
+}
+
+func (_c *MockOrderRepository_Transaction_Call) Run(run func(context1 context.Context, dB *gorm.DB, fn func(*gorm.DB) error)) *MockOrderRepository_Transaction_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 func(*gorm.DB) error
+		if args[2] != nil {
+			arg2 = args[2].(func(*gorm.DB) error)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockOrderRepository_Transaction_Call) Return(err error) *MockOrderRepository_Transaction_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockOrderRepository_Transaction_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, fn func(*gorm.DB) error) error) *MockOrderRepository_Transaction_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Update provides a mock function for the type MockOrderRepository
 func (_mock *MockOrderRepository) Update(context1 context.Context, dB *gorm.DB, order *entity.Order) error {
 	ret := _mock.Called(context1, dB, order)

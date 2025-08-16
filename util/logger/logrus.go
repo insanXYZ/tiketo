@@ -30,7 +30,7 @@ func InitLogger() {
 	case "panic":
 		level = logrus.PanicLevel
 	default:
-		level = logrus.ErrorLevel
+		level = logrus.WarnLevel
 	}
 
 	log.SetFormatter(&logrus.JSONFormatter{})

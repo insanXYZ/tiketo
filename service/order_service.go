@@ -28,18 +28,19 @@ type OrderServiceInterface interface {
 	HandleAfterPayment(context.Context, *dto.AfterPayment) error
 	HandleGetHistoryOrder(context.Context, jwt.MapClaims, *dto.GetOrder) (*entity.Order, error)
 	HandleGetHistoryOrders(context.Context, jwt.MapClaims) ([]entity.Order, error)
+	HandleCreate(context.Context, jwt.MapClaims, *dto.CreateOrder) (*snap.Response, error)
 }
 
 type OrderService struct {
-	orderRepository       *repository.OrderRepository
-	ticketRepository      *repository.TicketRepository
-	orderDetailRepository *repository.OrderDetailRepository
-	userRepository        *repository.UserRepository
+	orderRepository       repository.OrderRepositoryInterface
+	ticketRepository      repository.TicketRepositoryInterface
+	orderDetailRepository repository.OrderDetailRepositoryInterface
+	userRepository        repository.UserRepositoryInterface
 	redis                 db.RedisInterface
 	db                    *gorm.DB
 }
 
-func NewOrderService(orderRepository *repository.OrderRepository, orderDetailRepository *repository.OrderDetailRepository, userRepository *repository.UserRepository, ticketRepository *repository.TicketRepository, redis db.RedisInterface, db *gorm.DB) *OrderService {
+func NewOrderService(orderRepository repository.OrderRepositoryInterface, orderDetailRepository repository.OrderDetailRepositoryInterface, userRepository repository.UserRepositoryInterface, ticketRepository repository.TicketRepositoryInterface, redis db.RedisInterface, db *gorm.DB) *OrderService {
 	return &OrderService{
 		orderDetailRepository: orderDetailRepository,
 		userRepository:        userRepository,
@@ -76,7 +77,7 @@ func (o *OrderService) HandleAfterPayment(ctx context.Context, req *dto.AfterPay
 		return errors.New(message.ErrSignatureKey)
 	}
 
-	err = o.db.Transaction(func(tx *gorm.DB) error {
+	err = o.orderRepository.Transaction(ctx, o.db, func(tx *gorm.DB) error {
 		order := &entity.Order{
 			ID: req.OrderId,
 		}
@@ -131,7 +132,7 @@ func (o *OrderService) HandleCreate(ctx context.Context, claims jwt.MapClaims, r
 		return nil, err
 	}
 
-	err = o.db.Transaction(func(tx *gorm.DB) error {
+	err = o.orderRepository.Transaction(ctx, o.db, func(tx *gorm.DB) error {
 		user := &entity.User{
 			ID: claims["sub"].(string),
 		}

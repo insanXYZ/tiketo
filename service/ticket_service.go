@@ -16,7 +16,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/insanXYZ/sage"
 	"gorm.io/gorm"
 )
 
@@ -30,12 +29,12 @@ type TicketServiceInterface interface {
 }
 
 type TicketService struct {
-	ticketRepository *repository.TicketRepository
+	ticketRepository repository.TicketRepositoryInterface
 	db               *gorm.DB
 	redis            db.RedisInterface
 }
 
-func NewTicketService(repository *repository.TicketRepository, db *gorm.DB, redis db.RedisInterface) *TicketService {
+func NewTicketService(repository repository.TicketRepositoryInterface, db *gorm.DB, redis db.RedisInterface) *TicketService {
 	return &TicketService{
 		ticketRepository: repository,
 		db:               db,
@@ -62,11 +61,6 @@ func (t *TicketService) HandleCreateTicket(ctx context.Context, claims jwt.MapCl
 		return err
 	}
 
-	err = sage.Validate(req.ImageFile)
-	if err != nil {
-		return err
-	}
-
 	file, err := req.ImageFile.Open()
 	if err != nil {
 		return err
@@ -77,10 +71,7 @@ func (t *TicketService) HandleCreateTicket(ctx context.Context, claims jwt.MapCl
 	id := uuid.NewString()
 	filename := util.GenerateFilenameTicket(id, filepath.Ext(req.ImageFile.Filename))
 
-	err = util.SaveTicketImage(file, filename)
-	if err != nil {
-		return err
-	}
+	util.SaveTicketImage(file, filename)
 
 	ticket := &entity.Ticket{
 		ID:          id,
@@ -146,10 +137,7 @@ func (t *TicketService) HandleUpdate(ctx context.Context, claims jwt.MapClaims, 
 			return err
 		}
 
-		err = util.SaveTicketImage(f, util.GenerateFilenameTicket(ticket.ID, filepath.Ext(req.ImageFile.Filename)))
-		if err != nil {
-			return err
-		}
+		util.SaveTicketImage(f, util.GenerateFilenameTicket(ticket.ID, filepath.Ext(req.ImageFile.Filename)))
 
 		ticket.Image = req.ImageFile.Filename
 	}

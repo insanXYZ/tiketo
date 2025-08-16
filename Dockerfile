@@ -7,5 +7,7 @@ RUN go build -o /app/main cmd/app/main.go
 FROM alpine:3
 WORKDIR /app
 COPY --from=builder /app/main /app
+COPY db /app/db
 RUN chmod +x main
+RUN touch .env
 CMD ./main

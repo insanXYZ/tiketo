@@ -39,6 +39,132 @@ func (_m *MockTicketRepository) EXPECT() *MockTicketRepository_Expecter {
 	return &MockTicketRepository_Expecter{mock: &_m.Mock}
 }
 
+// Create provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) Create(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
+	ret := _mock.Called(context1, dB, ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Create")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, *entity.Ticket) error); ok {
+		r0 = returnFunc(context1, dB, ticket)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type MockTicketRepository_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - ticket *entity.Ticket
+func (_e *MockTicketRepository_Expecter) Create(context1 interface{}, dB interface{}, ticket interface{}) *MockTicketRepository_Create_Call {
+	return &MockTicketRepository_Create_Call{Call: _e.mock.On("Create", context1, dB, ticket)}
+}
+
+func (_c *MockTicketRepository_Create_Call) Run(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket)) *MockTicketRepository_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 *entity.Ticket
+		if args[2] != nil {
+			arg2 = args[2].(*entity.Ticket)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_Create_Call) Return(err error) *MockTicketRepository_Create_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_Create_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Delete provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) Delete(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
+	ret := _mock.Called(context1, dB, ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, *entity.Ticket) error); ok {
+		r0 = returnFunc(context1, dB, ticket)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockTicketRepository_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - ticket *entity.Ticket
+func (_e *MockTicketRepository_Expecter) Delete(context1 interface{}, dB interface{}, ticket interface{}) *MockTicketRepository_Delete_Call {
+	return &MockTicketRepository_Delete_Call{Call: _e.mock.On("Delete", context1, dB, ticket)}
+}
+
+func (_c *MockTicketRepository_Delete_Call) Run(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket)) *MockTicketRepository_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 *entity.Ticket
+		if args[2] != nil {
+			arg2 = args[2].(*entity.Ticket)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_Delete_Call) Return(err error) *MockTicketRepository_Delete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_Delete_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindPagingWithJoinUser provides a mock function for the type MockTicketRepository
 func (_mock *MockTicketRepository) FindPagingWithJoinUser(context1 context.Context, dB *gorm.DB, tickets *[]entity.Ticket, n int) error {
 	ret := _mock.Called(context1, dB, tickets, n)
@@ -177,6 +303,195 @@ func (_c *MockTicketRepository_FindUserTickets_Call) RunAndReturn(run func(conte
 	return _c
 }
 
+// Save provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) Save(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
+	ret := _mock.Called(context1, dB, ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Save")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, *entity.Ticket) error); ok {
+		r0 = returnFunc(context1, dB, ticket)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_Save_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Save'
+type MockTicketRepository_Save_Call struct {
+	*mock.Call
+}
+
+// Save is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - ticket *entity.Ticket
+func (_e *MockTicketRepository_Expecter) Save(context1 interface{}, dB interface{}, ticket interface{}) *MockTicketRepository_Save_Call {
+	return &MockTicketRepository_Save_Call{Call: _e.mock.On("Save", context1, dB, ticket)}
+}
+
+func (_c *MockTicketRepository_Save_Call) Run(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket)) *MockTicketRepository_Save_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 *entity.Ticket
+		if args[2] != nil {
+			arg2 = args[2].(*entity.Ticket)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_Save_Call) Return(err error) *MockTicketRepository_Save_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_Save_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_Save_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Take provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) Take(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
+	ret := _mock.Called(context1, dB, ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Take")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, *entity.Ticket) error); ok {
+		r0 = returnFunc(context1, dB, ticket)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_Take_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Take'
+type MockTicketRepository_Take_Call struct {
+	*mock.Call
+}
+
+// Take is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - ticket *entity.Ticket
+func (_e *MockTicketRepository_Expecter) Take(context1 interface{}, dB interface{}, ticket interface{}) *MockTicketRepository_Take_Call {
+	return &MockTicketRepository_Take_Call{Call: _e.mock.On("Take", context1, dB, ticket)}
+}
+
+func (_c *MockTicketRepository_Take_Call) Run(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket)) *MockTicketRepository_Take_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 *entity.Ticket
+		if args[2] != nil {
+			arg2 = args[2].(*entity.Ticket)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_Take_Call) Return(err error) *MockTicketRepository_Take_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_Take_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_Take_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// TakeForUpdate provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) TakeForUpdate(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
+	ret := _mock.Called(context1, dB, ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for TakeForUpdate")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, *entity.Ticket) error); ok {
+		r0 = returnFunc(context1, dB, ticket)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_TakeForUpdate_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TakeForUpdate'
+type MockTicketRepository_TakeForUpdate_Call struct {
+	*mock.Call
+}
+
+// TakeForUpdate is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - ticket *entity.Ticket
+func (_e *MockTicketRepository_Expecter) TakeForUpdate(context1 interface{}, dB interface{}, ticket interface{}) *MockTicketRepository_TakeForUpdate_Call {
+	return &MockTicketRepository_TakeForUpdate_Call{Call: _e.mock.On("TakeForUpdate", context1, dB, ticket)}
+}
+
+func (_c *MockTicketRepository_TakeForUpdate_Call) Run(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket)) *MockTicketRepository_TakeForUpdate_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 *entity.Ticket
+		if args[2] != nil {
+			arg2 = args[2].(*entity.Ticket)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_TakeForUpdate_Call) Return(err error) *MockTicketRepository_TakeForUpdate_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_TakeForUpdate_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_TakeForUpdate_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // TakeWithUser provides a mock function for the type MockTicketRepository
 func (_mock *MockTicketRepository) TakeWithUser(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
 	ret := _mock.Called(context1, dB, ticket)
@@ -236,6 +551,132 @@ func (_c *MockTicketRepository_TakeWithUser_Call) Return(err error) *MockTicketR
 }
 
 func (_c *MockTicketRepository_TakeWithUser_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_TakeWithUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Transaction provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) Transaction(context1 context.Context, dB *gorm.DB, fn func(*gorm.DB) error) error {
+	ret := _mock.Called(context1, dB, fn)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Transaction")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, func(*gorm.DB) error) error); ok {
+		r0 = returnFunc(context1, dB, fn)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_Transaction_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Transaction'
+type MockTicketRepository_Transaction_Call struct {
+	*mock.Call
+}
+
+// Transaction is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - fn func(*gorm.DB) error
+func (_e *MockTicketRepository_Expecter) Transaction(context1 interface{}, dB interface{}, fn interface{}) *MockTicketRepository_Transaction_Call {
+	return &MockTicketRepository_Transaction_Call{Call: _e.mock.On("Transaction", context1, dB, fn)}
+}
+
+func (_c *MockTicketRepository_Transaction_Call) Run(run func(context1 context.Context, dB *gorm.DB, fn func(*gorm.DB) error)) *MockTicketRepository_Transaction_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 func(*gorm.DB) error
+		if args[2] != nil {
+			arg2 = args[2].(func(*gorm.DB) error)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_Transaction_Call) Return(err error) *MockTicketRepository_Transaction_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_Transaction_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, fn func(*gorm.DB) error) error) *MockTicketRepository_Transaction_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function for the type MockTicketRepository
+func (_mock *MockTicketRepository) Update(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error {
+	ret := _mock.Called(context1, dB, ticket)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *gorm.DB, *entity.Ticket) error); ok {
+		r0 = returnFunc(context1, dB, ticket)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockTicketRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type MockTicketRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - context1 context.Context
+//   - dB *gorm.DB
+//   - ticket *entity.Ticket
+func (_e *MockTicketRepository_Expecter) Update(context1 interface{}, dB interface{}, ticket interface{}) *MockTicketRepository_Update_Call {
+	return &MockTicketRepository_Update_Call{Call: _e.mock.On("Update", context1, dB, ticket)}
+}
+
+func (_c *MockTicketRepository_Update_Call) Run(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket)) *MockTicketRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 context.Context
+		if args[0] != nil {
+			arg0 = args[0].(context.Context)
+		}
+		var arg1 *gorm.DB
+		if args[1] != nil {
+			arg1 = args[1].(*gorm.DB)
+		}
+		var arg2 *entity.Ticket
+		if args[2] != nil {
+			arg2 = args[2].(*entity.Ticket)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockTicketRepository_Update_Call) Return(err error) *MockTicketRepository_Update_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockTicketRepository_Update_Call) RunAndReturn(run func(context1 context.Context, dB *gorm.DB, ticket *entity.Ticket) error) *MockTicketRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

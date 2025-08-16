@@ -15,6 +15,7 @@ type RepositoryInterface[T any] interface {
 	Delete(context.Context, *gorm.DB, T) error
 	Save(context.Context, *gorm.DB, T) error
 	Update(context.Context, *gorm.DB, T) error
+	Transaction(context.Context, *gorm.DB, func(*gorm.DB) error) error
 }
 
 type Repository[T any] struct {
@@ -63,7 +64,15 @@ func (r *Repository[T]) Save(ctx context.Context, db *gorm.DB, model T) error {
 func (r *Repository[T]) Update(ctx context.Context, db *gorm.DB, model T) error {
 	err := db.WithContext(ctx).Model(model).Updates(model).Error
 	if err != nil {
-		logger.Warn(nil, "Error update from database :", err.Error())
+		logger.WarnMethod("Repository.Update", err)
+	}
+	return err
+}
+
+func (r *Repository[T]) Transaction(ctx context.Context, db *gorm.DB, f func(tx *gorm.DB) error) error {
+	err := db.WithContext(ctx).Transaction(f)
+	if err != nil {
+		logger.WarnMethod("Repository.Transaction", err)
 	}
 	return err
 }

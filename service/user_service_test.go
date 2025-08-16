@@ -92,7 +92,7 @@ func TestUserService(t *testing.T) {
 
 	t.Run("Failed register", func(t *testing.T) {
 		mockUserRepository.On("Take", mock.Anything, mock.Anything, mock.AnythingOfType("*entity.User")).Return(nil).Once()
-		mockUserRepository.On("Create", mock.Anything, mock.Anything, mock.AnythingOfType("*entity.User")).Return(nil).Once()
+		mockUserRepository.On("Create", mock.Anything, mock.Anything, mock.AnythingOfType("*entity.User")).Return(nil)
 
 		userService := service.NewUserService(mockUserRepository, nil, mockRedis)
 		err := userService.HandleRegister(context.Background(), &dto.Register{
