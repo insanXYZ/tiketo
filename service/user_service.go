@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"tiketo/db"
 	"tiketo/dto"
+	"tiketo/dto/message"
 	"tiketo/entity"
 	"tiketo/repository"
 	"tiketo/util"
@@ -97,8 +98,8 @@ func (u *UserService) HandleRegister(ctx context.Context, req *dto.Register) err
 	}
 
 	err = u.userRepository.Take(ctx, u.db, user)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return err
+	if err == nil {
+		return errors.New(message.ErrRegisterEmailWasUsed)
 	}
 
 	b, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
