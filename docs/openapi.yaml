@@ -1,0 +1,629 @@
+openapi: 3.0.0
+info:
+  title: TiketoApi
+  version: 1.0.0
+  description: API for ticket management and ordering system
+servers:
+  - url: http://localhost:8080/api
+    description: Local development server
+
+components:
+  securitySchemes:
+    AccessToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Access token for authentication (without bearer prefix)
+    RefreshToken:
+      type: apiKey
+      in: cookie
+      name: refresh-token
+      description: Refresh token stored in cookie
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    CreateTicketRequest:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - quantity
+        - image
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: integer
+        quantity:
+          type: integer
+        image:
+          type: string
+          format: binary
+
+    UpdateTicketRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: integer
+        quantity:
+          type: integer
+        image:
+          type: string
+          format: binary
+
+    CreateOrderRequest:
+      type: object
+      required:
+        - ticket_id
+        - quantity
+      properties:
+        ticket_id:
+          type: string
+        quantity:
+          type: integer
+
+    LoginSuccessResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            access-token:
+              type: string
+
+    RefreshSuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            access-token:
+              type: string
+
+    UserResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+
+    TicketResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            name:
+              type: string
+            description:
+              type: string
+            image:
+              type: string
+            created_at:
+              type: string
+            quantity:
+              type: integer
+            price:
+              type: integer
+            user:
+              type: object
+              properties:
+                name:
+                  type: string
+
+    TicketsResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              image:
+                type: string
+              created_at:
+                type: string
+              quantity:
+                type: integer
+              price:
+                type: integer
+              user:
+                type: object
+                properties:
+                  name:
+                    type: string
+
+    MyTicketsResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              description:
+                type: string
+              image:
+                type: string
+              created_at:
+                type: string
+              quantity:
+                type: integer
+              price:
+                type: integer
+
+    OrderResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+            redirect_url:
+              type: string
+
+    OrdersResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                type: string
+              total:
+                type: integer
+              created_at:
+                type: string
+              paid_at:
+                type: string
+              order_detail:
+                type: object
+                properties:
+                  quantity:
+                    type: integer
+                  ticket:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      image:
+                        type: string
+                      created_at:
+                        type: string
+                      quantity:
+                        type: integer
+                      price:
+                        type: integer
+                      user:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+
+    OrderDetailResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            total:
+              type: integer
+            created_at:
+              type: string
+            paid_at:
+              type: string
+            order_detail:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                ticket:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    image:
+                      type: string
+                    created_at:
+                      type: string
+                    quantity:
+                      type: integer
+                    price:
+                      type: integer
+                    user:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+
+    SuccessMessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        errors:
+          type: object
+
+paths:
+  /login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: Refresh token cookie
+              schema:
+                type: string
+                example: refresh-token=abc123; HttpOnly; Path=/
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginSuccessResponse'
+        '400':
+          description: Login failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /register:
+    post:
+      summary: User registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '400':
+          description: Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /refresh:
+    get:
+      summary: Refresh access token using refresh token
+      security:
+        - RefreshToken: []
+      responses:
+        '200':
+          description: Token refresh successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshSuccessResponse'
+        '400':
+          description: Token refresh failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /me:
+    get:
+      summary: Get current user information
+      security:
+        - AccessToken: []
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Failed to retrieve user information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tickets/{id}:
+    get:
+      summary: Get specific ticket by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ticket retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        '400':
+          description: Failed to retrieve ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /tickets:
+    get:
+      summary: Get all tickets
+      responses:
+        '200':
+          description: Tickets retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketsResponse'
+        '400':
+          description: Failed to retrieve tickets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /me/tickets:
+    get:
+      summary: Get all tickets created by current user
+      security:
+        - AccessToken: []
+      responses:
+        '200':
+          description: User tickets retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyTicketsResponse'
+        '400':
+          description: Failed to retrieve user tickets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a new ticket
+      security:
+        - AccessToken: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateTicketRequest'
+      responses:
+        '200':
+          description: Ticket created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '400':
+          description: Failed to create ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /me/tickets/{id}:
+    delete:
+      summary: Delete a ticket by ID
+      security:
+        - AccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ticket deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '400':
+          description: Failed to delete ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update a ticket by ID
+      security:
+        - AccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UpdateTicketRequest'
+      responses:
+        '200':
+          description: Ticket updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessageResponse'
+        '400':
+          description: Failed to update ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /orders:
+    post:
+      summary: Create a new order
+      security:
+        - AccessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '400':
+          description: Failed to create order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /me/orders:
+    get:
+      summary: Get all orders for current user
+      security:
+        - AccessToken: []
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersResponse'
+        '400':
+          description: Failed to retrieve orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /me/orders/{id}:
+    get:
+      summary: Get specific order by ID for current user
+      security:
+        - AccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetailResponse'
+        '400':
+          description: Failed to retrieve order
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
